@@ -108,46 +108,46 @@
                 <h5 class="card-title">Kelengkapan Dokumen</h5>
             </div>
             <div class="card-body">
-                @foreach ($dataComponentQuestions as $componentQuestion)
-                    <p class="font-weight-bold">{{$loop->iteration}}. {{$componentQuestion->name}}</p>
-                    <div class="card mb-3">
-                        <div class="card-header">
-                            <h5 class="card-title">Indikator</h5>
-                        </div>
-                        <div class="card-body">
-                            @foreach ($componentQuestion->questionsIndicators as $questionsIndicator)
-                                <input type="hidden" name="questionIndicatorsId[]" value="{{$questionsIndicator->id}}">
-                                <p>{{$loop->iteration}}. {{$questionsIndicator->name}}</p>
-                                <div class="card">
+                @foreach ($scoretypeComponents as $scoretypeComponent)
+                    <div class="page-item" style="display: inline;">
+                        <button class="page-link" type="button" data-toggle="collapse" data-target="#collapse-{{$loop->iteration}}" aria-expanded="true" aria-controls="collapse-{{$loop->iteration}}">{{$scoretypeComponent->name}}</button>
+                    </div>
+                    <div class="collapse multi-collapse mb-3" id="collapse-{{$loop->iteration}}">
+                        <div class="card">
+                            <div class="card-body">
+                                @foreach ($scoretypeComponent->componentQuestions as $componentQuestion)
+                                <p class="font-weight-bold">{{$loop->iteration}}. {{$componentQuestion->name}}</p>
+                                <div class="card mb-3">
                                     <div class="card-header">
-                                        <h5 class="card-title">Dokumen</h5>
-                                        {{-- <div class="row">
-                                            <div class="col-sm-10">
-                                                <h5 class="card-title">Dokumen</h5>
-                                            </div>
-                                            <div class="col-sm-2">
-                                                <div class="form-check form-check-inline">
-                                                    <label for="" class="form-check-label mr-3">Checklist</label>
-                                                    <input type="checkbox" class="form-check-input" id="select-all-{{$questionsIndicator->id}}">
-                                                </div>
-                                            </div>
-                                        </div> --}}
+                                        <h5 class="card-title">Indikator</h5>
                                     </div>
                                     <div class="card-body">
-                                        @foreach ($questionsIndicator->indicatorsDocuments as $indicatorsDocument)
-                                            <div class="row border-bottom">
-                                                <div class="col-sm-11">
-                                                    <label>{{$indicatorsDocument->name}}</label>
+                                        @foreach ($componentQuestion->questionsIndicators as $questionsIndicator)
+                                            <input type="hidden" name="questionIndicatorsId[]" value="{{$questionsIndicator->id}}">
+                                            <p>{{$loop->iteration}}. {{$questionsIndicator->name}}</p>
+                                            <div class="card">
+                                                <div class="card-header">
+                                                    <h5 class="card-title">Dokumen</h5>
                                                 </div>
-                                                <div class="col-sm-1">
-                                                    <input type="hidden" name="indicatorDocuments[{{$questionsIndicator->id}}][]" value="{{$indicatorsDocument->id}}">
-                                                    <input type="checkbox" class="form-check-input" name="isChecked[{{$questionsIndicator->id}}][]" value="1">
+                                                <div class="card-body">
+                                                    @foreach ($questionsIndicator->indicatorsDocuments as $indicatorDoc)
+                                                        <div class="row border-bottom">
+                                                            <div class="col-sm-11">
+                                                                <label>{{$indicatorDoc->name}}</label>
+                                                            </div>
+                                                            <div class="col-sm-1">
+                                                                <input type="hidden" name="indicatorDocuments[{{$questionsIndicator->id}}][]" value="{{$indicatorDoc->id}}">
+                                                                <input type="checkbox" class="form-check-input" name="isChecked[{{$questionsIndicator->id}}][]" value="1">
+                                                            </div>
+                                                        </div>
+                                                    @endforeach
                                                 </div>
                                             </div>
                                         @endforeach
                                     </div>
                                 </div>
-                            @endforeach
+                                @endforeach
+                            </div>
                         </div>
                     </div>
                 @endforeach

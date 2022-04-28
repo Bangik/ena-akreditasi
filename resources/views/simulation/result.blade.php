@@ -70,29 +70,51 @@
             </div>
             <div class="card-body">
                 @foreach ($simulations->scoreDoc as $scoreDoc)
-                    <p class="font-weight-bold">{{$loop->iteration}}. {{$scoreDoc->questionsIndicator->name}}</p>
-                    <div class="card mb-3">
-                        <div class="card-header">
-                            <div class="row">
-                                <div class="col-sm-10">
-                                    <h5 class="card-title">Dokumen</h5>
-                                </div>
-                                <div class="col-sm-2">
-                                    <p>Ceklist : {{$scoreDoc->score}} / {{$scoreDoc->score_max}}</p>
-                                </div>
+                    <div class="page-item" style="display: inline;">
+                        <button class="page-link" type="button" data-toggle="collapse" data-target="#collapse-{{$loop->iteration}}" aria-expanded="true" aria-controls="collapse-{{$loop->iteration}}">{{$scoreDoc->scoretypeComponent->name}}</button>
+                    </div>
+                    <div class="collapse multi-collapse mb-3" id="collapse-{{$loop->iteration}}">
+                        <div class="card">
+                            <div class="card-header">
+                                {{-- <h5 class="card-title">Nilai {{$simulationScore->score}} / {{$simulationScore->score_max}}</h5> --}}
                             </div>
-                        </div>
-                        <div class="card-body">
-                            @foreach ($scoreDoc->simulationDocDetail as $simulationDocDetail)
-                                <div class="row border-bottom">
-                                    <div class="col-sm-11">
-                                        <label>{{$simulationDocDetail->simulationIndicatorsDocument->name}}</label>
+                            <div class="card-body">
+                                @foreach ($scoreDoc->scoretypeComponent as $scoretypeComponent)
+                                    <p class="font-weight-bold">{{$loop->iteration}}. {{$scoretypeComponent->componentQuestion->name}}</p>
+                                    {{-- <div class="card mb-3">
+                                        <div class="card-header">
+                                            <div class="row">
+                                                <div class="col-md-10">
+                                                    <h5 class="card-title">Jawaban</h5>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <div class="form-inline">
+                                                        <div class="form-group">
+                                                            <label for="" class="my-1 mr-2">Nilai : </label>
+                                                            <input type="number" class="form-control" min="1" max="4" value="{{$simulation_detail->score}}" disabled>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            @foreach ($simulation_detail->component_questions->questionsAnswers as $questionsAnswer)
+                                                <p>{{$questionsAnswer->level}}. {{$questionsAnswer->name}}</p>
+                                            @endforeach
+                                        </div>
                                     </div>
-                                    <div class="col-sm-1">
-                                        <input type="checkbox" class="form-check-input" {{$simulationDocDetail->is_checked == 1 ? 'checked' : 'disabled'}}>
-                                    </div>
-                                </div>
-                            @endforeach
+                                    <div class="card mb-3">
+                                        <div class="card-header">
+                                            <h5 class="card-title">Indikator</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            @foreach ($simulation_detail->component_questions->questionsIndicators as $questionsIndicator)
+                                                <p>{{$loop->iteration}}. {{$questionsIndicator->name}}</p>
+                                            @endforeach
+                                        </div>
+                                    </div> --}}
+                                @endforeach
+                            </div>
                         </div>
                     </div>
                 @endforeach

@@ -28,4 +28,9 @@ class ScoretypeComponents extends Model
     {
         return $this->hasMany(SimulationScore::class, 'scoretype_component_id', 'id');
     }
+
+    public function simulationDocument()
+    {
+        return $this->hasMany(SimulationDocument::class, 'scoretype_component_id', 'id');
+    }
 }
