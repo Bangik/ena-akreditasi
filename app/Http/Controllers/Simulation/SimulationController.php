@@ -55,7 +55,8 @@ class SimulationController extends Controller
         $total_score_max = 0;
         $score_doc = 0;
         $score_doc_max = 0;
-        // insert tabel simulasi score / score
+
+        // insert tabel simulasi_score dan tabel simulasi dokumens
         foreach($request->scoretypeComponentId as $key => $value){
             $scores = SimulationScore::create([
                 'id' => 'sim.2.'.$key . Str::random(10),
@@ -97,6 +98,8 @@ class SimulationController extends Controller
             $total_score += $score;
             $total_score_max += $score_max;
 
+            ////////////////////////////////////////////////////////////////
+
             // insert ke tabel simulation_document
             $simDoc = SimulationDocument::create([
                 'id' => 'sim.2.'.$key . Str::random(10),
@@ -113,36 +116,48 @@ class SimulationController extends Controller
             $score_sim_doc = 0;
             $score_sim_doc_max = 0;
 
-            foreach($request->questionIndicatorsId as $key => $value){
+            if(isset($request->questionIndicatorsId[$value])){
+                foreach($request->questionIndicatorsId[$value] as $key => $value2){
 
-                $simDocIndic = SimulationDocIndic::create([
-                    'id' => 'sim.2.'.$key . Str::random(10),
-                    'parent_id' => $simDoc->id,
-                    'questions_indicator_id' => $value,
-                    'score' => 1,
-                    'score_max' => 1,
-                    'created_on' => Carbon::now()->format('Y-m-d H:i:s'),
-                    'created_by' => 1,
-                    'modified_on' => Carbon::now()->format('Y-m-d H:i:s'),
-                    'modified_by' => 1,
-                ]);
+                    $simDocIndic = SimulationDocIndic::create([
+                        'id' => 'sim.2.'.$key . Str::random(10),
+                        'parent_id' => $simDoc->id,
+                        'questions_indicator_id' => $value2,
+                        'score' => 1,
+                        'score_max' => 1,
+                        'created_on' => Carbon::now()->format('Y-m-d H:i:s'),
+                        'created_by' => 1,
+                        'modified_on' => Carbon::now()->format('Y-m-d H:i:s'),
+                        'modified_by' => 1,
+                    ]);
 
-                if(isset($request->indicatorDocuments[$value])){
-                    foreach($request->indicatorDocuments[$value] as $key2 => $value2){
-                        SimulationDocDetail::create([
-                            'id' => 'sim.2.'.$key.'.'.$key2 . Str::random(10),
-                            'parent_id' => $simDocIndic->id,
-                            'indicators_documents_id' => $request->indicatorDocuments[$value][$key2],
-                            'is_checked' => $request->isChecked[$value][$key2],
-                            'created_on' => Carbon::now()->format('Y-m-d H:i:s'),
-                            'modified_on' => Carbon::now()->format('Y-m-d H:i:s'),
-                        ]);
-                        $score_sim_doc += $request->isChecked[$value][$key2];
-                        $score_sim_doc_max = count($request->indicatorDocuments[$value]);
+                    $score_sim_doc_indic = 0;
+                    $score_sim_doc_indic_max = 0;
+    
+                    if(isset($request->indicatorDocuments[$value2])){
+                        foreach($request->indicatorDocuments[$value2] as $key3 => $value3){
+                            SimulationDocDetail::create([
+                                'id' => 'sim.2.'.$key.'.'.$key3 . Str::random(10),
+                                'parent_id' => $simDocIndic->id,
+                                'indicators_documents_id' => $request->indicatorDocuments[$value2][$key3],
+                                'is_checked' => $request->isChecked[$value2][$key3],
+                                'created_on' => Carbon::now()->format('Y-m-d H:i:s'),
+                                'modified_on' => Carbon::now()->format('Y-m-d H:i:s'),
+                            ]);
+                            $score_sim_doc_indic += $request->isChecked[$value2][$key3];
+                            $score_sim_doc_indic_max = count($request->indicatorDocuments[$value2]);
+                        }
                     }
+
+                    SimulationDocIndic::where('id', $simDocIndic->id)->update([
+                        'score' => $score_sim_doc_indic,
+                        'score_max' => $score_sim_doc_indic_max,
+                    ]);
+
+                    $score_sim_doc += $score_sim_doc_indic;
+                    $score_sim_doc_max += $score_sim_doc_indic_max;
                 }
             }
-
             SimulationDocument::where('id', $simDoc->id)->update([
                 'score' => $score_sim_doc,
                 'score_max' => $score_sim_doc_max,
@@ -159,9 +174,9 @@ class SimulationController extends Controller
             'score_doc_max' => $score_doc_max,
         ]);
 
-        // return redirect()->route('simulation.index');
+        return redirect()->route('simulation.index');
 
-        return $request->all();
+        // return $request->all();
     }
 
     public function result($id)
@@ -171,7 +186,7 @@ class SimulationController extends Controller
             'scores.simulationDetails.component_questions.questionsAnswers',
             'scores.simulationDetails.component_questions.questionsIndicators',
             'scoreDoc.scoretypeComponent',
-            'scoreDoc.scoretypeComponent.componentQuestions',
+            'scoreDoc.scoretypeComponent.componentQuestions.questionsIndicators',
             'scoreDoc.simulationDocIndic.simulationDocDetail.simulationIndicatorsDocument',
             'scoreDoc.simulationDocIndic.questionIndicator.indicatorsDocuments',
         )

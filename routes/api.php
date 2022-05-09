@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ImportController;
+use App\Http\Controllers\Api\SimulationController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -20,3 +21,4 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::get('/testing', [ImportController::class, 'testingApi']);
+Route::get('/simulations', [SimulationController::class, 'index']);

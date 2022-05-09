@@ -123,7 +123,7 @@
                                     </div>
                                     <div class="card-body">
                                         @foreach ($componentQuestion->questionsIndicators as $questionsIndicator)
-                                            <input type="hidden" name="questionIndicatorsId[]" value="{{$questionsIndicator->id}}">
+                                            <input type="hidden" name="questionIndicatorsId[{{$scoretypeComponent->id}}][]" value="{{$questionsIndicator->id}}">
                                             <p>{{$loop->iteration}}. {{$questionsIndicator->name}}</p>
                                             <div class="card">
                                                 <div class="card-header">
