@@ -60,7 +60,8 @@
                             </div>
                             <div class="collapse multi-collapse mb-3" id="collapse-{{$loop->iteration}}">
                                 <div class="card card-body">
-                                    @foreach ($scoretypeComponent->componentQuestions as $componentQuestion)
+                                    {{-- @dd($scoretypeComponent->componentQuestions) --}}
+                                    @foreach ($scoretypeComponent->componentQuestions->sortBy('seq') as $componentQuestion)
                                         <p class="font-weight-bold">{{$loop->iteration}}. {{$componentQuestion->name}}</p>
                                         <input type="hidden" name="componentQuestionId[{{$scoretypeComponent->id}}][]" value="{{$componentQuestion->id}}">
                                         <div class="card mb-3">
@@ -80,7 +81,7 @@
                                                 </div>
                                             </div>
                                             <div class="card-body">
-                                                @foreach ($componentQuestion->questionsAnswers as $questionsAnswer)
+                                                @foreach ($componentQuestion->questionsAnswers->sortByDesc('level') as $questionsAnswer)
                                                     <p>{{$questionsAnswer->level}}. {{$questionsAnswer->name}}</p>
                                                 @endforeach
                                             </div>

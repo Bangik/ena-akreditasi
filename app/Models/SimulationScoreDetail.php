@@ -9,7 +9,7 @@ class SimulationScoreDetail extends Model
 {
     use HasFactory;
     protected $table = 'simulation_score_details';
-    protected $fillable = ['id', 'parent_id', 'component_questions_id', 'score'];
+    protected $fillable = ['id', 'parent_id', 'component_questions_id', 'score', 'created_on', 'modified_on'];
     public $timestamps = false;
     public $keyType = 'string';
     public $incrementing = false;

@@ -24,9 +24,9 @@ class QuestionsIndicators extends Model
     public $timestamps = false;
     public $keyType = 'string';
 
-    public function questionsAnswers()
+    public function componentQuestions()
     {
-        return $this->belongsTo(QuestionsAnswers::class, 'parent_id', 'id');
+        return $this->belongsTo(ComponentsQuestions::class, 'parent_id', 'id');
     }
 
     public function indicatorsDocuments()
