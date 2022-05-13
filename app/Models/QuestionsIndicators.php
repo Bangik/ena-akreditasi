@@ -24,9 +24,9 @@ class QuestionsIndicators extends Model
     public $timestamps = false;
     public $keyType = 'string';
 
-    public function questionsAnswers()
+    public function componentQuestions()
     {
-        return $this->belongsTo(QuestionsAnswers::class, 'parent_id', 'id');
+        return $this->belongsTo(ComponentsQuestions::class, 'parent_id', 'id');
     }
 
     public function indicatorsDocuments()
@@ -34,8 +34,8 @@ class QuestionsIndicators extends Model
         return $this->hasMany(IndicatorsDocuments::class, 'parent_id', 'id');
     }
 
-    public function simulationDocuments()
+    public function simulationDocIndic()
     {
-        return $this->hasMany(SimulationDocument::class, 'parent_id', 'id');
+        return $this->hasMany(SimulationDocIndic::class, 'parent_id', 'id');
     }
 }

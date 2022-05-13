@@ -19,6 +19,7 @@ class ScoretypeComponents extends Migration
             $table->string('parent_id', 25);
             $table->foreign('parent_id')->references('id')->on('scoretype')->onUpdate('cascade')->onDelete('cascade');
             $table->string('name', 50);
+            $table->decimal('weight', 5, 2)->nullable();
             $table->string('isactive', 1)->default('1');
             $table->datetime('created_on')->nullable();
             $table->string('created_by', 25)->nullable();

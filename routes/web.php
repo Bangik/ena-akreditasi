@@ -31,5 +31,6 @@ Route::get('/testing-simulation', [ImportController::class, 'testingSimulation']
 
 Route::get('/simulation', [SimulationController::class, 'index'])->name('simulation.index');
 Route::get('/simulation/result/{id}', [SimulationController::class, 'result'])->name('simulation.result');
+Route::get('/simulation/result-based-question', [SimulationController::class, 'resultBasedOnQuestion'])->name('simulation.resultBasedOnQuestion');
 Route::post('/simulation/store', [SimulationController::class, 'store'])->name('simulation.store');
 Route::delete('/simulation/delete/{id}', [SimulationController::class, 'destroy'])->name('simulation.delete');

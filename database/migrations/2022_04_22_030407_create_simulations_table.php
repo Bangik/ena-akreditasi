@@ -19,6 +19,10 @@ class CreateSimulationsTable extends Migration
             $table->smallInteger('total_score_max')->nullable();
             $table->smallInteger('score_doc')->nullable();
             $table->smallInteger('score_doc_max')->nullable();
+            $table->decimal('ipr', 5, 2)->nullable();
+            $table->decimal('total_score_comp', 5, 2)->nullable();
+            $table->decimal('na', 5, 2)->nullable();
+            $table->string('rating', 25)->nullable();
             $table->datetime('created_on')->nullable();
             $table->string('created_by', 25)->nullable();
             $table->datetime('modified_on')->nullable();

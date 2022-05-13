@@ -21,6 +21,7 @@ class CreateSimulationsScoreTable extends Migration
             $table->foreign('scoretype_component_id')->references('id')->on('scoretype_components')->onUpdate('cascade')->onDelete('cascade');
             $table->smallInteger('score')->nullable();
             $table->smallInteger('score_max')->nullable();
+            $table->decimal('score_comp',5,2)->nullable();
             $table->datetime('created_on')->nullable();
             $table->datetime('modified_on')->nullable();
         });

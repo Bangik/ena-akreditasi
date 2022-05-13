@@ -9,7 +9,7 @@ class SimulationDocument extends Model
 {
     use HasFactory;
     protected $table = 'simulation_documents';
-    protected $fillable = ['id','parent_id', 'questions_indicator_id', 'score', 'score_max', 'created_on', 'modified_on'];
+    protected $fillable = ['id','parent_id', 'scoretype_component_id', 'score', 'score_max', 'created_on', 'modified_on'];
     public $timestamps = false;
     public $keyType = 'string';
     public $incrementing = false;
@@ -19,13 +19,13 @@ class SimulationDocument extends Model
         return $this->belongsTo(Simulation::class, 'parent_id', 'id');
     }
 
-    public function questionsIndicator()
+    public function scoretypeComponent()
     {
-        return $this->belongsTo(QuestionsIndicators::class, 'questions_indicator_id', 'id');
+        return $this->belongsTo(ScoretypeComponents::class, 'scoretype_component_id', 'id');
     }
 
-    public function simulationDocDetail()
+    public function simulationDocIndic()
     {
-        return $this->hasMany(SimulationDocDetail::class, 'parent_id', 'id');
+        return $this->hasMany(SimulationDocIndic::class, 'parent_id', 'id');
     }
 }

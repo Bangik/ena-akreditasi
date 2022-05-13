@@ -16,7 +16,7 @@ class SimulationDocDetail extends Model
 
     public function simulationParent()
     {
-        return $this->belongsTo(SimulationDocument::class, 'parent_id', 'id');
+        return $this->belongsTo(SimulationDocIndic::class, 'parent_id', 'id');
     }
 
     public function simulationIndicatorsDocument()
