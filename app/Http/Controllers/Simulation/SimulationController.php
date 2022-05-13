@@ -22,7 +22,31 @@ class SimulationController extends Controller
     public function index()
     {
         // DB::enableQueryLog();
-        $simulations = Simulation::all()->sortByDesc('created_on');
+        $simulationScores = SimulationScoreDetail::with(
+            'component_questions.questionsAnswers',
+            'component_questions.scoretypeComponents',
+        )
+        ->get()
+        ->groupBy('component_questions.scoretypeComponents.name');
+
+        $simulationsResults = Simulation::with(
+            'scores.scoretype_component',
+            'scores.simulationDetails.component_questions.questionsAnswers',
+            'scores.simulationDetails.component_questions.questionsIndicators',
+            'scoreDoc.scoretypeComponent',
+            // 'scoreDoc.scoretypeComponent.componentQuestions.questionsIndicators',
+            'scoreDoc.simulationDocIndic.simulationDocDetail',
+            // 'scoreDoc.simulationDocIndic.questionIndicator.indicatorsDocuments',
+        )
+        ->get()
+        ->sortByDesc('created_on');
+
+        $simulationDocDetails = SimulationDocDetail::with(
+            'simulationIndicatorsDocument.indicatorsQuestions.componentQuestions.scoretypeComponents',
+        )
+        ->get()
+        ->sortBy('simulationIndicatorsDocument.indicatorsQuestions.componentQuestions.scoretypeComponents.id')
+        ->groupBy('simulationIndicatorsDocument.indicatorsQuestions.componentQuestions.scoretypeComponents.name');
 
         $scoretypeComponents = ScoretypeComponents::with(
             'componentQuestions.questionsAnswers',
@@ -31,9 +55,11 @@ class SimulationController extends Controller
         $dataComponentQuestions = ComponentsQuestions::with('questionsIndicators.indicatorsDocuments')->get();
         // dd($scoretypeComponents->toArray());
         return view('simulation.index', compact(
-            'simulations',
+            'simulationScores',
             'scoretypeComponents',
-            'dataComponentQuestions'
+            'dataComponentQuestions',
+            'simulationsResults',
+            'simulationDocDetails',
         ));
     }
 
