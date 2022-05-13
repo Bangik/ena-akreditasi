@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Simulation;
 
 use App\Http\Controllers\Controller;
 use App\Models\ComponentsQuestions;
+use App\Models\Scoretype;
 use App\Models\ScoretypeComponents;
 use App\Models\Simulation;
 use App\Models\SimulationDocDetail;
@@ -38,16 +39,16 @@ class SimulationController extends Controller
 
     public function store(Request $request)
     {
+        // $weight_comp = 
         // tabel simulasi
+        $weight = Scoretype::get('weight');
+        $timeNow = Carbon::now()->format('Y-m-d H:i:s');
+
         $simulation = Simulation::create([
             'id' => 'sim.'. Str::random(10),
-            'total_score' => 1,
-            'total_score_max' => 1,
-            'score_doc' => 1,
-            'score_doc_max' => 1,
-            'created_on' => Carbon::now()->format('Y-m-d H:i:s'),
+            'created_on' => $timeNow,
             'created_by' => 1,
-            'modified_on' => Carbon::now()->format('Y-m-d H:i:s'),
+            'modified_on' => $timeNow,
             'modified_by' => 1,
         ]);
         
@@ -55,6 +56,10 @@ class SimulationController extends Controller
         $total_score_max = 0;
         $score_doc = 0;
         $score_doc_max = 0;
+        $ipr = 0;
+        $total_score_comp = 0;
+        $na = 0;
+        $rating = '';
 
         // insert tabel simulasi_score dan tabel simulasi dokumens
         foreach($request->scoretypeComponentId as $key => $value){
@@ -62,18 +67,15 @@ class SimulationController extends Controller
                 'id' => 'sim.2.'.$key . Str::random(10),
                 'parent_id' => $simulation->id,
                 'scoretype_component_id' => $value,
-                'score' => 1,
-                'score_max' => 1,
-                'score_doc' => 1,
-                'score_doc_max' => 1,
-                'created_on' => Carbon::now()->format('Y-m-d H:i:s'),
+                'created_on' => $timeNow,
                 'created_by' => 1,
-                'modified_on' => Carbon::now()->format('Y-m-d H:i:s'),
+                'modified_on' => $timeNow,
                 'modified_by' => 1,
             ]);
             
             $score = 0;
             $score_max = 0;
+            $score_comp = 0;
             // insert tabel simulasi score detail / simulation_details
             foreach($request->nilai[$value] as $key2 => $value2){
                 SimulationScoreDetail::create([
@@ -81,18 +83,25 @@ class SimulationController extends Controller
                     'parent_id' => $scores->id,
                     'component_questions_id' => $request->componentQuestionId[$value][$key2],
                     'score' => $value2,
-                    'created_on' => Carbon::now()->format('Y-m-d H:i:s'),
+                    'created_on' => $timeNow,
                     'created_by' => 1,
-                    'modified_on' => Carbon::now()->format('Y-m-d H:i:s'),
+                    'modified_on' => $timeNow,
                     'modified_by' => 1,
                 ]);
                 $score += $value2;
                 $score_max = 4 * count($request->nilai[$value]);
             }
 
+            $score_comp = $score / $score_max * $request->weightComp[$key];
+            $ipr = $score_comp;
+            if($key != count($request->weightComp) - 1){
+                $total_score_comp += $score_comp;
+            }
+
             SimulationScore::where('id', $scores->id)->update([
                 'score' => $score,
                 'score_max' => $score_max,
+                'score_comp' => $score_comp,
             ]);
 
             $total_score += $score;
@@ -107,9 +116,9 @@ class SimulationController extends Controller
                 'scoretype_component_id' => $value,
                 'score' => 1,
                 'score_max' => 1,
-                'created_on' => Carbon::now()->format('Y-m-d H:i:s'),
+                'created_on' => $timeNow,
                 'created_by' => 1,
-                'modified_on' => Carbon::now()->format('Y-m-d H:i:s'),
+                'modified_on' => $timeNow,
                 'modified_by' => 1,
             ]);
 
@@ -125,9 +134,9 @@ class SimulationController extends Controller
                         'questions_indicator_id' => $value2,
                         'score' => 1,
                         'score_max' => 1,
-                        'created_on' => Carbon::now()->format('Y-m-d H:i:s'),
+                        'created_on' => $timeNow,
                         'created_by' => 1,
-                        'modified_on' => Carbon::now()->format('Y-m-d H:i:s'),
+                        'modified_on' => $timeNow,
                         'modified_by' => 1,
                     ]);
 
@@ -141,8 +150,8 @@ class SimulationController extends Controller
                                 'parent_id' => $simDocIndic->id,
                                 'indicators_documents_id' => $request->indicatorDocuments[$value2][$key3],
                                 'is_checked' => $request->isChecked[$value2][$key3],
-                                'created_on' => Carbon::now()->format('Y-m-d H:i:s'),
-                                'modified_on' => Carbon::now()->format('Y-m-d H:i:s'),
+                                'created_on' => $timeNow,
+                                'modified_on' => $timeNow,
                             ]);
                             $score_sim_doc_indic += $request->isChecked[$value2][$key3];
                             $score_sim_doc_indic_max = count($request->indicatorDocuments[$value2]);
@@ -167,11 +176,18 @@ class SimulationController extends Controller
             $score_doc_max += $score_sim_doc_max;
         }
 
+        $na = ($weight[0]->weight * $ipr) + ($weight[1]->weight * $total_score_comp);
+        $rating = $na >= 91 ? 'A' : ($na >= 81 ? 'B' : ($na >= 71 ? 'C' : 'Tidak Terakreditasi'));
+
         Simulation::where('id', $simulation->id)->update([
             'total_score' => $total_score,
             'total_score_max' => $total_score_max,
             'score_doc' => $score_doc,
             'score_doc_max' => $score_doc_max,
+            'ipr' => $ipr,
+            'total_score_comp' => $total_score_comp,
+            'na' => $na,
+            'rating' => $rating,
         ]);
 
         return redirect()->route('simulation.index');
@@ -207,25 +223,23 @@ class SimulationController extends Controller
             'scores.scoretype_component',
             'scores.simulationDetails.component_questions.questionsAnswers',
             'scores.simulationDetails.component_questions.questionsIndicators',
-            // 'scoreDoc.scoretypeComponent',
+            'scoreDoc.scoretypeComponent',
             // 'scoreDoc.scoretypeComponent.componentQuestions.questionsIndicators',
-            // 'scoreDoc.simulationDocIndic.simulationDocDetail.simulationIndicatorsDocument',
+            'scoreDoc.simulationDocIndic.simulationDocDetail',
             // 'scoreDoc.simulationDocIndic.questionIndicator.indicatorsDocuments',
         )
         ->get()
         ->sortByDesc('created_on');
-        $simulationDocs = Simulation::with(
-            // 'scores.scoretype_component',
-            // 'scores.simulationDetails.component_questions.questionsAnswers',
-            // 'scores.simulationDetails.component_questions.questionsIndicators',
-            // 'scoreDoc.scoretypeComponent',
-            'scoreDoc.scoretypeComponent.componentQuestions.questionsIndicators',
-            'scoreDoc.simulationDocIndic.simulationDocDetail.simulationIndicatorsDocument',
-            'scoreDoc.simulationDocIndic.questionIndicator.indicatorsDocuments',
-        )->get();
+
+        $simulationDocDetails = SimulationDocDetail::with(
+            'simulationIndicatorsDocument.indicatorsQuestions.componentQuestions.scoretypeComponents',
+        )
+        ->get()
+        ->sortBy('simulationIndicatorsDocument.indicatorsQuestions.componentQuestions.scoretypeComponents.id')
+        ->groupBy('simulationIndicatorsDocument.indicatorsQuestions.componentQuestions.scoretypeComponents.name');
         // dd($simulationDocs->toArray());
-        // dd($simulationsResults->toArray());
-        return view('simulation.resultBasedQuest', compact('simulations', 'simulationsResults', 'simulationDocs'));
+        // dd($simulationDocDetails->toArray());
+        return view('simulation.resultBasedQuest', compact('simulations', 'simulationsResults','simulationDocDetails'));
     }
 
     public function destroy($id)

@@ -55,6 +55,7 @@
                     <div>
                         @foreach ($scoretypeComponents as $scoretypeComponent)
                             <input type="hidden" name="scoretypeComponentId[]" value="{{$scoretypeComponent->id}}">
+                            <input type="hidden" name="weightComp[]" value="{{$scoretypeComponent->weight}}">
                             <div class="page-item" style="display: inline;">
                                 <button class="page-link" type="button" data-toggle="collapse" data-target="#collapse-{{$loop->iteration}}" aria-expanded="true" aria-controls="collapse-{{$loop->iteration}}">{{$scoretypeComponent->name}}</button>
                             </div>
@@ -187,6 +188,20 @@
         $("#form").on('submit', function() {
             // to each unchecked checkbox
             $(this).find('input[type=checkbox]:not(:checked)').prop('checked', true).val(0);
+            // $.ajax({
+            //     url: $(this).attr('action'),
+            //     type: 'POST',
+            //     data: $(this).serialize(),
+            //     success: function(data) {
+            //         console.log(data);
+            //         if (data.status) {
+            //             alert(data.message);
+            //             window.location.href = {{route('simulation.index')}};
+            //         } else {
+            //             alert(data.message);
+            //         }
+            //     }
+            // });
         })
 
 
