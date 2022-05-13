@@ -1,216 +1,208 @@
 @extends('layouts.simulation.app')
 @section('sim-main')
-<h1 class="text-center">Simulasi Akreditasi</h1>
 
-<div class="card mb-4">
-    <div class="card-header">
-        <h5 class="card-title">Riwayat Simulasi</h5>
-    </div>
-    <div class="card-body">
-        <table class="table">
-            <thead>
-                <tr>
-                    <td>Tanggal</td>
-                    <td>Total Score</td>
-                    <td>Total Score Max</td>
-                    <td>Score Kelengkapan Dokumen</td>
-                    <td>Score Max Kelengkapan Dokumen</td>
-                    <td>Aksi</td>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach ($simulations as $simulation)
+    <center>
+        <h1>Simulasi Akreditasi</h1>
+
+        <div data-role="collapsible" data-collapsed="false">
+            <h4>Riwayat Simulasi</h4>
+            <table data-role="table" id="table-column-toggle" class="ui-responsive table-stroke">
+                <thead>
                     <tr>
-                        <td>{{ Carbon\Carbon::parse($simulation->created_on)->format('d-M-Y H:i') }}</td>
-                        <td>{{ $simulation->total_score }}</td>
-                        <td>{{ $simulation->total_score_max }}</td>
-                        <td>{{ $simulation->score_doc }}</td>
-                        <td>{{ $simulation->score_doc_max }}</td>
-                        <td>
-                            <a href="{{ route('simulation.result', ['id' => $simulation->id]) }}" class="btn btn-primary">Lihat Hasil</a>
-                            <form action="{{route('simulation.delete', ['id' => $simulation->id])}}" method="post">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-danger">Hapus</button>
-                            </form>
-                        </td>
+                        <td>Tanggal</td>
+                        <td>Total Score</td>
+                        <td>Total Score Max</td>
+                        <td>Score Kelengkapan Dokumen</td>
+                        <td>Score Max Kelengkapan Dokumen</td>
+                        <td>Aksi</td>
                     </tr>
-                @endforeach
-            </tbody>
-        </table>
-    </div>
-</div>
+                </thead>
+                <tbody>
+                    @foreach ($simulations as $simulation)
+                        <tr>
+                            <td>{{ Carbon\Carbon::parse($simulation->created_on)->format('d-M-Y H:i') }}</td>
+                            <td>{{ $simulation->total_score }}</td>
+                            <td>{{ $simulation->total_score_max }}</td>
+                            <td>{{ $simulation->score_doc }}</td>
+                            <td>{{ $simulation->score_doc_max }}</td>
+                            <td>
+                                <a href="{{ route('simulation.result', ['id' => $simulation->id]) }}" data-class="ui-btn">Lihat Hasil</a>
+                                <form action="{{route('simulation.delete', ['id' => $simulation->id])}}" method="post" id="form-hapus-{{$loop->iteration}}">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="button" data-class="ui-btn" id="btn-hapus-{{$loop->iteration}}">Hapus</button>
+                                </form>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
 
-<button class="btn btn-primary mb-4" type="button" id="btn-mulai">Mulai Simulasi</button> <br>
-<button class="btn btn-outline-primary" type="button" id="btn-nilai" style="display: none;">Simulasi Nilai</button>
-<button class="btn btn-outline-primary" type="button" id="btn-doc" style="display: none;">Simulasi Kelengkapan dokumen</button>
-<div class="row mt-4">
-    <div class="col-md-12">
-        <form action="{{route('simulation.store')}}" method="post" id="form">
-        <div class="card" id="card-nilai" style="display: none;">
-            <div class="card-header">
-                <h5 class="card-title">Nilai</h5>
-            </div>
-            <div class="card-body">
-                    <div>
+        <button id="btn-mulai" style="display: none"><span>Mulai Simulasi</span></button>
+        <button id="btn-selesai" style="display: none"><span>Akhiri Simulasi</span></button>
+    </center>
+
+    <div data-role="tabs" id="tabs" style="display: none">
+        <div data-role="navbar">
+            <ul>
+                <li><a href="#one" class="ui-btn-active">Simulasi Nilai</a></li>
+                <li><a href="#two">Simulasi Kelengkapan Dokumen</a></li>
+            </ul>
+        </div>
+
+        <form id="form">
+            @csrf
+            <div id="one" class="ui-body-d ui-content">
+                <div data-role="tabs" id="tabs1">
+                    <div data-role="navbar">
+                        <ul>
                         @foreach ($scoretypeComponents as $scoretypeComponent)
-                            <input type="hidden" name="scoretypeComponentId[]" value="{{$scoretypeComponent->id}}">
-                            <input type="hidden" name="weightComp[]" value="{{$scoretypeComponent->weight}}">
-                            <div class="page-item" style="display: inline;">
-                                <button class="page-link" type="button" data-toggle="collapse" data-target="#collapse-{{$loop->iteration}}" aria-expanded="true" aria-controls="collapse-{{$loop->iteration}}">{{$scoretypeComponent->name}}</button>
-                            </div>
-                            <div class="collapse multi-collapse mb-3" id="collapse-{{$loop->iteration}}">
-                                <div class="card card-body">
-                                    {{-- @dd($scoretypeComponent->componentQuestions) --}}
-                                    @foreach ($scoretypeComponent->componentQuestions->sortBy('seq') as $componentQuestion)
-                                        <p class="font-weight-bold">{{$loop->iteration}}. {{$componentQuestion->name}}</p>
-                                        <input type="hidden" name="componentQuestionId[{{$scoretypeComponent->id}}][]" value="{{$componentQuestion->id}}">
-                                        <div class="card mb-3">
-                                            <div class="card-header">
-                                                <div class="row">
-                                                    <div class="col-md-10">
-                                                        <h5 class="card-title">Jawaban</h5>
-                                                    </div>
-                                                    <div class="col-md-2">
-                                                        <div class="form-inline">
-                                                            <div class="form-group">
-                                                                <label for="" class="my-1 mr-2">Nilai : </label>
-                                                                <input type="number" name="nilai[{{$scoretypeComponent->id}}][]" class="form-control" min="1" max="4">
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="card-body">
-                                                @foreach ($componentQuestion->questionsAnswers->sortByDesc('level') as $questionsAnswer)
-                                                    <p>{{$questionsAnswer->level}}. {{$questionsAnswer->name}}</p>
-                                                @endforeach
+                            <!-- TAB KOMPONEN -->
+                            <li>
+                                <input type="hidden" name="scoretypeComponentId[]" value="{{$scoretypeComponent->id}}">
+                                <input type="hidden" name="weightComp[]" value="{{$scoretypeComponent->weight}}">
+                                <a href="#satu-{{$loop->iteration}}" class="{{$loop->iteration == 1 ? 'ui-btn-active' : ''}}">{{$scoretypeComponent->name}}</a>
+                            </li>
+                        @endforeach
+                        </ul>
+                    </div>
+                    
+                    @foreach ($scoretypeComponents as $scoretypeComponent)
+                    <div id="satu-{{$loop->iteration}}">
+                        <div class="ui-corner-all custom-corners">
+                            @foreach ($scoretypeComponent->componentQuestions->sortBy('seq') as $componentQuestion)
+                            <div class="ui-bar ui-bar-a">
+                                <!-- PERTANYAAN -->
+                                <p>{{$componentQuestion->seq}}. {{$componentQuestion->name}}</p>
+                                <input type="hidden" name="componentQuestionId[{{$scoretypeComponent->id}}][]" value="{{$componentQuestion->id}}">
+                                <div class="ui-body ui-body-a">
+                                    <div class="ui-grid-a">
+                                        <div class="ui-block-a">
+                                            <div class="ui-bar ui-bar-a">Jawaban</div>
+                                        </div>
+                                        <div class="ui-block-b">
+                                            <div class="ui-bar ui-bar-a" style="text-align: right">Nilai (1-4) &nbsp
+                                                <input type="number" data-clear-btn="false" data-role="none" name="nilai[{{$scoretypeComponent->id}}][]" min="1" max="4" style="height: 15px; width:50px; float:right">
                                             </div>
                                         </div>
-                                        <div class="card mb-3">
-                                            <div class="card-header">
-                                                <h5 class="card-title">Indikator</h5>
-                                            </div>
-                                            <div class="card-body">
-                                                @foreach ($componentQuestion->questionsIndicators as $questionsIndicator)
-                                                    <p>{{$loop->iteration}}. {{$questionsIndicator->name}}</p>
+                                    </div>
+                                    @foreach ($componentQuestion->questionsAnswers->sortByDesc('level') as $questionsAnswer)
+                                    <!-- JAWABAN -->
+                                    <p style="font-weight: normal!important">{{$questionsAnswer->level}}. {{$questionsAnswer->name}}</p>
+                                    @endforeach
+                                    <div class="ui-bar ui-bar-a">Indikator</div>
+                                    <!-- INDIKATOR -->
+                                    @foreach ($componentQuestion->questionsIndicators as $questionsIndicator)
+                                        <p style="font-weight:normal!important;">{{$loop->iteration}}. {{$questionsIndicator->name}}</p>
+                                    @endforeach
+                                </div>
+                            </div>
+                            @endforeach
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+
+            </div>
+
+            <div id="two" class="ui-body-d ui-content">
+                <div data-role="tabs" id="tabs1">
+                    <div data-role="navbar">
+                        <ul>
+                        @foreach ($scoretypeComponents as $scoretypeComponent)
+                        <!-- TAB KOMPONEN -->
+                        <li><a href="#siji-{{$loop->iteration}}" class="{{$loop->iteration == 1 ? 'ui-btn-active' : ''}}">{{$scoretypeComponent->name}}</a></li>
+                        @endforeach
+                        </ul>
+                    </div>
+
+                    @foreach ($scoretypeComponents as $scoretypeComponent)
+                    <div id="siji-{{$loop->iteration}}">
+                        <div class="ui-corner-all custom-corners">
+                            @foreach ($scoretypeComponent->componentQuestions as $componentQuestion)
+                            <div class="ui-bar ui-bar-a">
+                                <!-- PERTANYAAN -->
+                                {{$loop->iteration}}. {{$componentQuestion->name}}
+                                <div class="ui-body ui-body-a">
+                                    <div class="ui-bar ui-bar-a">Indikator</div>
+                                    @foreach ($componentQuestion->questionsIndicators as $questionsIndicator)
+                                        <input type="hidden" name="questionIndicatorsId[{{$scoretypeComponent->id}}][]" value="{{$questionsIndicator->id}}">
+                                        <!-- INDIKATOR -->
+                                        <p style="font-weight:normal!important;">{{$loop->iteration}}. {{$questionsIndicator->name}}</p>
+                                        <div class="ui-corner-all custom-corners">
+                                            <div class="ui-bar ui-bar-a">Dokumen</div>
+                                                <!-- INDIKATOR -->
+                                                @foreach($questionsIndicator->indicatorsDocuments as $indicatorDocument)
+                                                    <label>
+                                                        <!-- INDIKATOR DOKUMEN -->
+                                                        <input type="checkbox" name="isChecked[{{$questionsIndicator->id}}][]" value="1">{{$indicatorDocument->name}}
+                                                        <input type="hidden" name="indicatorDocuments[{{$questionsIndicator->id}}][]" value="{{$indicatorDocument->id}}">
+                                                    </label>
                                                 @endforeach
-                                            </div>
                                         </div>
                                     @endforeach
                                 </div>
                             </div>
-                        @endforeach
-                        @csrf
-                    </div>                
-            </div>
-        </div>
-        <div class="card" id="card-doc" style="display: none;">
-            <div class="card-header">
-                <h5 class="card-title">Kelengkapan Dokumen</h5>
-            </div>
-            <div class="card-body">
-                @foreach ($scoretypeComponents as $scoretypeComponent)
-                    <div class="page-item" style="display: inline;">
-                        <button class="page-link" type="button" data-toggle="collapse" data-target="#collapse-{{$loop->iteration}}" aria-expanded="true" aria-controls="collapse-{{$loop->iteration}}">{{$scoretypeComponent->name}}</button>
-                    </div>
-                    <div class="collapse multi-collapse mb-3" id="collapse-{{$loop->iteration}}">
-                        <div class="card">
-                            <div class="card-body">
-                                @foreach ($scoretypeComponent->componentQuestions as $componentQuestion)
-                                <p class="font-weight-bold">{{$loop->iteration}}. {{$componentQuestion->name}}</p>
-                                <div class="card mb-3">
-                                    <div class="card-header">
-                                        <h5 class="card-title">Indikator</h5>
-                                    </div>
-                                    <div class="card-body">
-                                        @foreach ($componentQuestion->questionsIndicators as $questionsIndicator)
-                                            <input type="hidden" name="questionIndicatorsId[{{$scoretypeComponent->id}}][]" value="{{$questionsIndicator->id}}">
-                                            <p>{{$loop->iteration}}. {{$questionsIndicator->name}}</p>
-                                            <div class="card">
-                                                <div class="card-header">
-                                                    <h5 class="card-title">Dokumen</h5>
-                                                </div>
-                                                <div class="card-body">
-                                                    @foreach ($questionsIndicator->indicatorsDocuments as $indicatorDoc)
-                                                        <div class="row border-bottom">
-                                                            <div class="col-sm-11">
-                                                                <label>{{$indicatorDoc->name}}</label>
-                                                            </div>
-                                                            <div class="col-sm-1">
-                                                                <input type="hidden" name="indicatorDocuments[{{$questionsIndicator->id}}][]" value="{{$indicatorDoc->id}}">
-                                                                <input type="checkbox" class="form-check-input" name="isChecked[{{$questionsIndicator->id}}][]" value="1">
-                                                            </div>
-                                                        </div>
-                                                    @endforeach
-                                                </div>
-                                            </div>
-                                        @endforeach
-                                    </div>
-                                </div>
-                                @endforeach
-                            </div>
+                            @endforeach
                         </div>
                     </div>
-                @endforeach
+                    @endforeach
+                </div>
             </div>
-        </div>
-        <button type="submit" class="btn btn-primary mt-3" style="display: none;" id="btn-simpan">Simpan</button>
-    </form>
+
+            <!-- Tombol Tambah Data -->
+            <div data-role="footer" data-position="fixed" style="position:fixed">
+                <div data-role="navbar">
+                    <ul>
+                        <li><button type="button" data-icon="check" data-class="ui-btn" id="btn-simpan">Simpan</button></li>
+                    </ul>
+                </div>  
+            </div>
+        </form>
     </div>
-</div>
 @endsection
 
 @section('sim-js')
 <script>
-    $(document).ready(function(){
-        $('#btn-mulai').click(function(){
-            $('#btn-nilai').show();
-            $('#btn-doc').show();
+    $(document).ready(function() {
+        $('#btn-mulai').show();
+            $('#btn-mulai').click(function(){
+                $('#btn-mulai').hide();
+                $('#btn-selesai').show();
+                $('#tabs').show();
+            $('#btn-selesai').click(function(){
+                $('#btn-selesai').hide();
+                $('#tabs').hide();
+                $('#btn-mulai').show();
+            });
         });
 
-        $('#btn-nilai').click(function(){
-            $(this).addClass('active');
-            $('#btn-doc').removeClass('active');
-            $('#card-doc').hide();
-            $('#card-nilai').show();
-            $('#btn-simpan').show();
-        });
-
-        $('#btn-doc').click(function(){
-            $(this).addClass('active');
-            $('#btn-nilai').removeClass('active');
-            $('#card-doc').show();
-            $('#card-nilai').hide();
-            $('#btn-simpan').show();
-        });
-
-        $("#form").on('submit', function() {
+        $("#btn-simpan").click(function() {
             // to each unchecked checkbox
-            $(this).find('input[type=checkbox]:not(:checked)').prop('checked', true).val(0);
-            // $.ajax({
-            //     url: $(this).attr('action'),
-            //     type: 'POST',
-            //     data: $(this).serialize(),
-            //     success: function(data) {
-            //         console.log(data);
-            //         if (data.status) {
-            //             alert(data.message);
-            //             window.location.href = {{route('simulation.index')}};
-            //         } else {
-            //             alert(data.message);
-            //         }
-            //     }
-            // });
-        })
+            $('#form').find('input[type=checkbox]:not(:checked)').prop('checked', true).val(0);
+            $.ajax({
+                url: "{{route('simulation.store')}}",
+                type: 'POST',
+                data: $('#form').serialize(),
+                success: function(data) {
+                    window.location.href = "{{route('simulation.index')}}";
+                }
+            });
+        });
 
-
-        // $('#select-all').click(function() {
-        //     var checked = this.checked;
-        //     $('input[type="checkbox"]').each(function() {
-        //         this.checked = checked;
-        //     });
-        // });
-    });
+        @foreach ($simulations as $simulation)
+            $('#btn-hapus-{{$loop->iteration}}').click(function() {
+                $.ajax({
+                    url: $('#form-hapus-{{$loop->iteration}}').attr('action'),
+                    type: 'DELETE',
+                    data: $('#form-hapus-{{$loop->iteration}}').serialize(),
+                    success: function(data) {
+                        window.location.href = "{{route('simulation.index')}}";
+                    }
+                });
+            });
+        @endforeach
+    })
 </script>
 @endsection

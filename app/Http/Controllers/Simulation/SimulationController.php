@@ -190,7 +190,10 @@ class SimulationController extends Controller
             'rating' => $rating,
         ]);
 
-        return redirect()->route('simulation.index');
+        // return redirect()->route('simulation.index');
+        return response()->json([
+            'status' => 'success',
+        ]);
 
         // return $request->all();
     }
@@ -246,6 +249,9 @@ class SimulationController extends Controller
     {
         $data = Simulation::find($id);
         $data->delete();
-        return redirect()->route('simulation.index');
+        // return redirect()->route('simulation.index');
+        return response()->json([
+            'status' => 'success',
+        ]);
     }
 }
