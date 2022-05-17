@@ -4,7 +4,7 @@
     <center>
         <h1>Simulasi Akreditasi</h1>
 
-        <div data-role="collapsible" data-collapsed="false" id="riwayat-simulasi">
+        <div data-role="collapsible" data-collapsed="false">
             <h4>Riwayat dan Rekapitulasi Hasil Simulasi</h4>
             <div data-role="tabs" id="tabs">
                 <div data-role="navbar">
@@ -185,14 +185,7 @@
             </div>
         </div>
 
-        <div data-role="footer" data-position="fixed" style="position:fixed">
-            <div data-role="navbar">
-                <ul>
-                    <li><button id="btn-mulai" data-icon="plus" data-class="ui-btn" style="display: none"><span>Mulai Simulasi</span></button></li>
-                </ul>
-            </div>  
-        </div>
-
+        <button id="btn-mulai" style="display: none"><span>Mulai Simulasi</span></button>
         <button id="btn-selesai" style="display: none"><span>Akhiri Simulasi</span></button>
     </center>
 
@@ -324,23 +317,18 @@
         let MyString = MyDate.toTimeString();
         let MyOffset = MyString.slice(12,17);
         $('#timezone').val(MyOffset);
-        $('#riwayat-simulasi').show()
-
+        
         $('#btn-mulai').show();
             $('#btn-mulai').click(function(){
                 $('#btn-mulai').hide();
                 $('#btn-selesai').show();
-                $('#tabs').show();
-                $('#riwayat-simulasi').hide()
-                window.scrollTo({ top: 0, behavior: 'smooth' });
+                $('#tabs-simulation').show();
             $('#btn-selesai').click(function(){
                 $('#btn-selesai').hide();
-                $('#tabs').hide();
+                $('#tabs-simulation').hide();
                 $('#btn-mulai').show();
-                $('#riwayat-simulasi').show()
-            })
-        })
-
+            });
+        });
 
         $("#btn-simpan").click(function() {
             // to each unchecked checkbox
