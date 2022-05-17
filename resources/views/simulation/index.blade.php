@@ -174,7 +174,7 @@
                                 <td>{{$simulationResult->na}}</td>
                                 <td>{{$simulationResult->rating}}</td>
                                 <td>
-                                    <a href="{{ route('simulation.result', ['id' => $simulationResult->id]) }}" class="ui-btn">Lihat Hasil</a>
+                                    <a href="{{ route('simulation.result', ['id' => $simulationResult->id]) }}" target="_blank" class="ui-btn">Lihat Hasil</a>
                                     <button type="button" class="ui-btn" id="btn-del-{{$loop->iteration}}">Hapus</button>
                                 </td>
                             </tr>
@@ -199,6 +199,7 @@
 
         <form id="form">
             @csrf
+            <input type="hidden" name="timezone" id="timezone">
             <div id="one" class="ui-body-d ui-content">
                 <div data-role="tabs" id="tabs1">
                     <div data-role="navbar">
@@ -312,6 +313,11 @@
 @section('sim-js')
 <script>
     $(document).ready(function() {
+        let MyDate = new Date();
+        let MyString = MyDate.toTimeString();
+        let MyOffset = MyString.slice(12,17);
+        $('#timezone').val(MyOffset);
+        
         $('#btn-mulai').show();
             $('#btn-mulai').click(function(){
                 $('#btn-mulai').hide();

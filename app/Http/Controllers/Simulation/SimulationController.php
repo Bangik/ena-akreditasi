@@ -68,7 +68,7 @@ class SimulationController extends Controller
         // $weight_comp = 
         // tabel simulasi
         $weight = Scoretype::get('weight');
-        $timeNow = Carbon::now()->format('Y-m-d H:i:s');
+        $timeNow = Carbon::now($request->timezone)->format('Y-m-d H:i:s');
 
         $simulation = Simulation::create([
             'id' => 'sim.'. Str::random(10),

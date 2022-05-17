@@ -1,142 +1,116 @@
 @extends('layouts.simulation.app')
 @section('sim-main')
-<h1 class="text-center">Hasil Simulasi Akreditasi</h1>
-<h5 class="text-center">Tanggal {{Carbon\Carbon::parse($simulations->created_on)->format('d-M-Y H:i')}}</h5>
-<h6 class="text-center">Total Nilai : {{$simulations->total_score}} / {{$simulations->total_score_max}}</h6>
-<h6 class="text-center">Kelengkapan Dokumen : {{$simulations->score_doc}} / {{$simulations->score_doc_max}}</h6>
-<button class="btn btn-primary" type="button" id="btn-nilai">Simulasi Nilai</button>
-<button class="btn btn-primary" type="button" id="btn-doc">Simulasi Kelengkapan dokumen</button>
-<div class="row mt-4">
-    <div class="col-md-12">
-        <div class="card" id="card-nilai">
-            <div class="card-header">
-                <h5 class="card-title">Nilai</h5>
-            </div>
-            <div class="card-body">
+
+    <center>
+    <h1>Hasil Simulasi Akreditasi</h1>
+    <h5>Tanggal {{Carbon\Carbon::parse($simulations->created_on)->format('d-M-Y H:i')}}</h5>
+    <h6>Total Nilai : {{$simulations->total_score}} / {{$simulations->total_score_max}}</h6>
+    <h6>Kelengkapan Dokumen : {{$simulations->score_doc}} / {{$simulations->score_doc_max}}</h6>
+    </center>
+
+    <!-- Button Simulasi Nilai dan Kelengkapan Dokumen -->
+    <div data-role="tabs" id="tabs">
+        <div data-role="navbar">
+            <ul>
+                <li><a href="#one">Simulasi Nilai</a></li>
+                <li><a href="#two">Simulasi Kelengkapan Dokumen</a></li>
+            </ul>
+        </div>
+
+        <div id="one" class="ui-body-d ui-content">
+            <div data-role="tabs" id="tabs1">
+                <div data-role="navbar">
+                    <ul>
+                    @foreach ($simulations->scores as $simulationScore)
+                        <!-- TAB KOMPONEN -->
+                        <li>
+                            <a href="#satu-{{$loop->iteration}}">{{$simulationScore->scoretype_component->name}}</a>
+                        </li>
+                    @endforeach
+                    </ul>
+                </div>
+
                 @foreach ($simulations->scores as $simulationScore)
-                    <div class="page-item" style="display: inline;">
-                        <button class="page-link" type="button" data-toggle="collapse" data-target="#collapse-{{$loop->iteration}}" aria-expanded="true" aria-controls="collapse-{{$loop->iteration}}">{{$simulationScore->scoretype_component->name}}</button>
-                    </div>
-                    <div class="collapse multi-collapse mb-3" id="collapse-{{$loop->iteration}}">
-                        <div class="card">
-                            <div class="card-header">
-                                <h5 class="card-title">Nilai {{$simulationScore->score}} / {{$simulationScore->score_max}}</h5>
-                            </div>
-                            <div class="card-body">
-                                @foreach ($simulationScore->simulationDetails as $simulation_detail)
-                                    <p class="font-weight-bold">{{$loop->iteration}}. {{$simulation_detail->component_questions->name}}</p>
-                                    <div class="card mb-3">
-                                        <div class="card-header">
-                                            <div class="row">
-                                                <div class="col-md-10">
-                                                    <h5 class="card-title">Jawaban</h5>
-                                                </div>
-                                                <div class="col-md-2">
-                                                    <div class="form-inline">
-                                                        <div class="form-group">
-                                                            <label for="" class="my-1 mr-2">Nilai : </label>
-                                                            <input type="number" class="form-control" min="1" max="4" value="{{$simulation_detail->score}}" disabled>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="card-body">
-                                            @foreach ($simulation_detail->component_questions->questionsAnswers as $questionsAnswer)
-                                                <p>{{$questionsAnswer->level}}. {{$questionsAnswer->name}}</p>
-                                            @endforeach
+                <div id="satu-{{$loop->iteration}}">
+                    <div class="ui-corner-all custom-corners">
+                        <div class="ui-bar ui-bar-a">
+                            <!-- PERTANYAAN -->
+                        @foreach ($simulationScore->simulationDetails as $simulation_detail)
+                            <p>{{$loop->iteration}}. {{$simulation_detail->component_questions->name}}</p>
+                            
+                            <div class="ui-body ui-body-a">
+                                <div class="ui-grid-a">
+                                    <div class="ui-block-a">
+                                        <div class="ui-bar ui-bar-a">Jawaban</div>
+                                    </div>
+                                    <div class="ui-block-b">
+                                        <div class="ui-bar ui-bar-a" style="text-align: right">Nilai (1-4) &nbsp
+                                            <input type="number" data-clear-btn="false" data-role="none" value="{{$simulation_detail->score}}" disabled min="1" max="4" style="height: 15px; width:50px; float:right">
                                         </div>
                                     </div>
-                                    <div class="card mb-3">
-                                        <div class="card-header">
-                                            <h5 class="card-title">Indikator</h5>
-                                        </div>
-                                        <div class="card-body">
-                                            @foreach ($simulation_detail->component_questions->questionsIndicators as $questionsIndicator)
-                                                <p>{{$loop->iteration}}. {{$questionsIndicator->name}}</p>
-                                            @endforeach
-                                        </div>
-                                    </div>
+                                </div>
+                                @foreach ($simulation_detail->component_questions->questionsAnswers as $questionsAnswer)
+                                <!-- JAWABAN -->
+                                    <p style="font-weight: normal!important">{{$questionsAnswer->level}}. {{$questionsAnswer->name}}</p>
+                                @endforeach
+                                        
+                                <div class="ui-bar ui-bar-a">Indikator</div>
+                                @foreach ($simulation_detail->component_questions->questionsIndicators as $questionsIndicator)
+                                <!-- INDIKATOR -->
+                                    <p style="font-weight:normal!important;">{{$loop->iteration}}. {{$questionsIndicator->name}}</p>
                                 @endforeach
                             </div>
+                        @endforeach
                         </div>
                     </div>
+                </div>
                 @endforeach
             </div>
         </div>
-        <div class="card" id="card-doc" style="display: none;">
-            <div class="card-header">
-                <h5 class="card-title">Kelengkapan Dokumen</h5>
-            </div>
-            <div class="card-body">
+
+        <div id="two" class="ui-body-d ui-content">
+            <div data-role="tabs" id="tabs2">
+                <div data-role="navbar">
+                    <ul>
+                    @foreach ($simulations->scoreDoc as $scoreDoc)
+                        <!-- TAB KOMPONEN -->
+                        <li>
+                            <a href="#siji-{{$loop->iteration}}">{{$scoreDoc->scoretypeComponent->name}}</a>
+                        </li>
+                    @endforeach
+                    </ul>
+                </div>
+
                 @foreach ($simulations->scoreDoc as $scoreDoc)
-                    <div class="page-item" style="display: inline;">
-                        <button class="page-link" type="button" data-toggle="collapse" data-target="#collapse-{{$loop->iteration}}" aria-expanded="true" aria-controls="collapse-{{$loop->iteration}}">{{$scoreDoc->scoretypeComponent->name}}</button>
-                    </div>
-                    <div class="collapse multi-collapse mb-3" id="collapse-{{$loop->iteration}}">
-                        <div class="card">
-                            <div class="card-header">
-                                <h5>Score : {{$scoreDoc->score}} / {{$scoreDoc->score_max}}</h5>
-                            </div>
-                            <div class="card-body">
-                                @foreach ($scoreDoc->scoretypeComponent->componentQuestions as $componentQuestions)
-                                    <p class="font-weight-bold">{{$loop->iteration}}. {{$componentQuestions->name}}</p>
-                                    <div class="card mb-3">
-                                        <div class="card-header">
-                                            <h5 class="card-title">Indikator</h5>
-                                        </div>
-                                        <div class="card-body">
-                                            @foreach ($scoreDoc->simulationDocIndic as $simulationDocIndic)
-                                                @if($componentQuestions->id == $simulationDocIndic->questionIndicator->parent_id)
-                                                    <p>{{$simulationDocIndic->questionIndicator->seq}}. {{$simulationDocIndic->questionIndicator->name}}</p>
-                                                    <div class="card mb-3">
-                                                        <div class="card-header">
-                                                            <h5 class="card-title">Dokumen</h5>
-                                                        </div>
-                                                        <div class="card-body">
-                                                            @foreach ($simulationDocIndic->simulationDocDetail as $indicatorsDocuments)
-                                                                <div class="row border-bottom">
-                                                                    <div class="col-sm-11">
-                                                                        <label>{{$indicatorsDocuments->simulationIndicatorsDocument->name}}</label>
-                                                                    </div>
-                                                                    <div class="col-sm-1">
-                                                                        <input type="checkbox" class="form-check-input" {{$indicatorsDocuments->is_checked == 1 ? 'checked' : 'disabled'}}>
-                                                                    </div>
-                                                                </div>
-                                                            @endforeach
-                                                        </div>
-                                                    </div>
-                                                @endif
+                <div id="siji-{{$loop->iteration}}">
+                    <div class="ui-corner-all custom-corners">
+                        @foreach ($scoreDoc->scoretypeComponent->componentQuestions as $componentQuestions)           
+                        <div class="ui-bar ui-bar-a">
+                        <!-- PERTANYAAN -->
+                            {{$loop->iteration}}. {{$componentQuestions->name}}
+                            <div class="ui-body ui-body-a">
+                                <div class="ui-bar ui-bar-a">Indikator</div>
+                                @foreach ($scoreDoc->simulationDocIndic as $simulationDocIndic)
+                                    @if($componentQuestions->id == $simulationDocIndic->questionIndicator->parent_id)
+                                        <p>{{$simulationDocIndic->questionIndicator->seq}}. {{$simulationDocIndic->questionIndicator->name}}</p>
+                                        <div class="ui-body ui-body-a">
+                                            <div class="ui-bar ui-bar-a">Dokumen</div>
+                                            @foreach ($simulationDocIndic->simulationDocDetail as $indicatorsDocuments)
+                                                <label>
+                                                {{$indicatorsDocuments->simulationIndicatorsDocument->name}}
+                                                <input type="checkbox" {{$indicatorsDocuments->is_checked == 1 ? 'checked' : 'disabled'}}>
+                                                </label>
                                             @endforeach
                                         </div>
-                                    </div>
+                                    @endif
                                 @endforeach
                             </div>
                         </div>
+                        @endforeach
                     </div>
+                </div>
                 @endforeach
             </div>
         </div>
     </div>
-</div>
-@endsection
-
-@section('sim-js')
-<script>
-    $(document).ready(function(){
-        $('#btn-nilai').click(function(){
-            $(this).addClass('active');
-            $('#btn-doc').removeClass('active');
-            $('#card-doc').hide();
-            $('#card-nilai').show();
-        });
-
-        $('#btn-doc').click(function(){
-            $(this).addClass('active');
-            $('#btn-nilai').removeClass('active');
-            $('#card-doc').show();
-            $('#card-nilai').hide();
-        });
-    });
-</script>
 @endsection
