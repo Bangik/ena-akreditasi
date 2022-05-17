@@ -22,32 +22,6 @@ class SimulationController extends Controller
     public function index()
     {
         // DB::enableQueryLog();
-        $simulationScores = SimulationScoreDetail::with(
-            'component_questions.questionsAnswers',
-            'component_questions.scoretypeComponents',
-        )
-        ->get()
-        ->groupBy('component_questions.scoretypeComponents.name');
-
-        $simulationsResults = Simulation::with(
-            'scores.scoretype_component',
-            'scores.simulationDetails.component_questions.questionsAnswers',
-            'scores.simulationDetails.component_questions.questionsIndicators',
-            'scoreDoc.scoretypeComponent',
-            // 'scoreDoc.scoretypeComponent.componentQuestions.questionsIndicators',
-            'scoreDoc.simulationDocIndic.simulationDocDetail',
-            // 'scoreDoc.simulationDocIndic.questionIndicator.indicatorsDocuments',
-        )
-        ->get()
-        ->sortByDesc('created_on');
-
-        $simulationDocDetails = SimulationDocDetail::with(
-            'simulationIndicatorsDocument.indicatorsQuestions.componentQuestions.scoretypeComponents',
-        )
-        ->get()
-        ->sortBy('simulationIndicatorsDocument.indicatorsQuestions.componentQuestions.scoretypeComponents.id')
-        ->groupBy('simulationIndicatorsDocument.indicatorsQuestions.componentQuestions.scoretypeComponents.name');
-
         $scoretypeComponents = ScoretypeComponents::with(
             'componentQuestions.questionsAnswers',
             'componentQuestions.questionsIndicators.indicatorsDocuments',
@@ -55,11 +29,8 @@ class SimulationController extends Controller
         $dataComponentQuestions = ComponentsQuestions::with('questionsIndicators.indicatorsDocuments')->get();
         // dd($scoretypeComponents->toArray());
         return view('simulation.index', compact(
-            'simulationScores',
             'scoretypeComponents',
             'dataComponentQuestions',
-            'simulationsResults',
-            'simulationDocDetails',
         ));
     }
 
@@ -241,13 +212,13 @@ class SimulationController extends Controller
     }
 
     public function resultBasedOnQuestion(){
-        $simulations = SimulationScoreDetail::with(
+        $simulationScores = SimulationScoreDetail::with(
             'component_questions.questionsAnswers',
             'component_questions.scoretypeComponents',
         )
         ->get()
         ->groupBy('component_questions.scoretypeComponents.name');
-        // dd($simulations->toArray());
+
         $simulationsResults = Simulation::with(
             'scores.scoretype_component',
             'scores.simulationDetails.component_questions.questionsAnswers',
@@ -268,7 +239,7 @@ class SimulationController extends Controller
         ->groupBy('simulationIndicatorsDocument.indicatorsQuestions.componentQuestions.scoretypeComponents.name');
         // dd($simulationDocs->toArray());
         // dd($simulationDocDetails->toArray());
-        return view('simulation.resultBasedQuest', compact('simulations', 'simulationsResults','simulationDocDetails'));
+        return view('simulation.resultBasedQuest', compact('simulationScores', 'simulationsResults','simulationDocDetails'));
     }
 
     public function destroy($id)
