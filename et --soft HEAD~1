@@ -1,0 +1,74 @@
+[33mcommit 162648cbd239c785c05ea5a8c796023f0f170b99[m[33m ([m[1;36mHEAD -> [m[1;32mmaster[m[33m, [m[1;31morigin/master[m[33m)[m
+Author: labibofficial21 <labibofficial21@gmail.com>
+Date:   Tue May 17 14:40:21 2022 +0700
+
+    penambahan scroll smooth dan fixed position
+
+[33mcommit 62ace60a8a046c19aa90efea105e6d6df3465f95[m
+Author: Bangik <aldi.novaldi.frmnsyah@gmail.com>
+Date:   Tue May 17 12:59:35 2022 +0700
+
+    merge result blade php
+
+[33mcommit a37fd3a7f998523832e7be98fa3bb2eadd90a61d[m
+Author: Bangik <aldi.novaldi.frmnsyah@gmail.com>
+Date:   Fri May 13 16:37:06 2022 +0700
+
+    tampilan index dengan jquery mob
+
+[33mcommit 33cda29baeadaf849d83b1a155011440394a35c5[m
+Author: Bangik <aldi.novaldi.frmnsyah@gmail.com>
+Date:   Fri May 13 11:21:42 2022 +0700
+
+    perubahan ke library jquery mob pada index
+
+[33mcommit d93e44645aef156d2411323dc9c083171547095d[m
+Merge: fb5fc8f c74816d
+Author: Achmad Dinofaldi Firmansyah <47439247+Bangik@users.noreply.github.com>
+Date:   Fri May 13 09:29:33 2022 +0700
+
+    Merge pull request #1 from Bangik/penambahan-kolom-penskoran
+    
+    Penambahan kolom dan ubah relasi
+
+[33mcommit c74816d58d4b79c28234268659dda7cc6af5269d[m[33m ([m[1;31morigin/penambahan-kolom-penskoran[m[33m, [m[1;32mpenambahan-kolom-penskoran[m[33m)[m
+Author: Bangik <aldi.novaldi.frmnsyah@gmail.com>
+Date:   Fri May 13 09:21:29 2022 +0700
+
+    final di branch ini
+
+[33mcommit 52f9da43bdafc3bbc2e502e7e22ddd6ec3adc2fe[m[33m ([m[1;31morigin/relasi-simulasi-doc-ke-scoretype-comp[m[33m, [m[1;32mrelasi-simulasi-doc-ke-scoretype-comp[m[33m)[m
+Author: Bangik <aldi.novaldi.frmnsyah@gmail.com>
+Date:   Wed May 11 11:02:01 2022 +0700
+
+    bikin tampilan rekap
+
+[33mcommit fb5fc8f6a507736e68040dc5498ca4a25f4094b3[m[33m ([m[1;31morigin/copy-of-old-master[m[33m, [m[1;32mcopy-of-old-master[m[33m)[m
+Author: Bangik <aldi.novaldi.frmnsyah@gmail.com>
+Date:   Mon May 9 16:28:49 2022 +0700
+
+    add procfile
+
+[33mcommit b9e08f846b344e17167081e9512be2b770aaba1c[m[33m ([m[1;31mheroku/master[m[33m)[m
+Author: Bangik <aldi.novaldi.frmnsyah@gmail.com>
+Date:   Mon May 9 16:18:29 2022 +0700
+
+    profile heroku
+
+[33mcommit 151934d1dbb811c903a997aa475b50bef9e9c5ac[m
+Author: Bangik <aldi.novaldi.frmnsyah@gmail.com>
+Date:   Mon May 9 16:11:55 2022 +0700
+
+    commit perubahan pada simulasi
+
+[33mcommit ed57dbd04280d3587d475188186efcae5adfc673[m
+Author: Bangik <aldi.novaldi.frmnsyah@gmail.com>
+Date:   Thu Apr 28 12:40:10 2022 +0700
+
+    masih ada eror belum fix
+
+[33mcommit 7bad0de66526d68b48402863d99ed34025022247[m
+Author: Bangik <aldi.novaldi.frmnsyah@gmail.com>
+Date:   Thu Apr 28 09:36:57 2022 +0700
+
+    first commit
