@@ -1,27 +1,54 @@
 @extends('layouts.simulation.app')
+@section('sim-css')
+<style>
+    .menu {
+    color:#000000;
+    position:relative;
+    left:0px;
+    width:100%;
+    }
+    .fixed {
+        position:fixed;
+        top:0;
+        z-index:3;
+    }
+
+    .menu2 {
+    color:#000000;
+    position:relative;
+    left:0px;
+    width:100%;
+    }
+    .fixed2 {
+        position:fixed;
+        top:35px;
+        z-index:3;
+    }
+</style>
+@endsection
 @section('sim-main')
 
     <center>
         <h1>Simulasi Akreditasi</h1>
-
+        <button id="btn-riwayat" style="display: none"><span>Riwayat Simulasi</span></button>
         <button id="btn-mulai" style="display: none"><span>Mulai Simulasi</span></button>
         <button id="btn-selesai" style="display: none"><span>Akhiri Simulasi</span></button>
     </center>
-
+   
     <div data-role="tabs" id="tabs-simulation" style="display: none">
-        <div data-role="navbar">
+        <div data-role="navbar" class="menu">
             <ul>
                 <li><a href="#one" class="ui-btn-active">Simulasi Nilai</a></li>
                 <li><a href="#two">Simulasi Kelengkapan Dokumen</a></li>
             </ul>
         </div>
-
+        
         <form id="form">
             @csrf
             <input type="hidden" name="timezone" id="timezone">
             <div id="one" class="ui-body-d ui-content">
                 <div data-role="tabs" id="tabs1">
-                    <div data-role="navbar">
+                    <div data-role="navbar" class="menu2">
                         <ul>
                         @foreach ($scoretypeComponents as $scoretypeComponent)
                             <!-- TAB KOMPONEN -->
@@ -33,7 +60,7 @@
                         @endforeach
                         </ul>
                     </div>
-                    
+
                     @foreach ($scoretypeComponents as $scoretypeComponent)
                     <div id="satu-{{$loop->iteration}}">
                         <div class="ui-corner-all custom-corners">
@@ -69,12 +96,11 @@
                     </div>
                     @endforeach
                 </div>
-
             </div>
 
             <div id="two" class="ui-body-d ui-content">
                 <div data-role="tabs" id="tabs1">
-                    <div data-role="navbar">
+                    <div data-role="navbar" class="menu2">
                         <ul>
                         @foreach ($scoretypeComponents as $scoretypeComponent)
                         <!-- TAB KOMPONEN -->
@@ -127,6 +153,7 @@
             </div>
         </form>
     </div>
+    
 @endsection
 
 @section('sim-js')
@@ -140,14 +167,21 @@
         $('#btn-mulai').show();
             $('#btn-mulai').click(function(){
                 $('#btn-mulai').hide();
+                $('#btn-riwayat').hide();
                 $('#btn-selesai').show();
                 $('#tabs-simulation').show();
             $('#btn-selesai').click(function(){
                 $('#btn-selesai').hide();
                 $('#tabs-simulation').hide();
                 $('#btn-mulai').show();
+                $('#btn-riwayat').show();
             });
         });
+
+        $('#btn-riwayat').show();
+            $('#btn-riwayat').click(function(){
+                window.location.href = "{{route('simulation.resultBasedOnQuestion')}}";
+            })
 
         $("#btn-simpan").click(function() {
             // to each unchecked checkbox
@@ -160,6 +194,24 @@
                     window.location.href = "{{route('simulation.resultBasedOnQuestion')}}";
                 }
             });
+        });
+
+        var num = 200; //number of pixels before modifying styles
+
+        $(window).bind('scroll', function () {
+            if ($(window).scrollTop() > num) {
+                $('.menu').addClass('fixed');
+            } else {
+                $('.menu').removeClass('fixed');
+            }
+        });
+
+        $(window).bind('scroll', function () {
+            if ($(window).scrollTop() > num) {
+                $('.menu2').addClass('fixed2');
+            } else {
+                $('.menu2').removeClass('fixed2');
+            }
         });
     });
 </script>
