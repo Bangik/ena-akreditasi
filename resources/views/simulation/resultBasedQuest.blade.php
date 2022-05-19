@@ -1,7 +1,12 @@
 @extends('layouts.simulation.app')
 @section('sim-main')
 
-<div data-role="collapsible" data-collapsed="false">
+<center>
+    <h1>Simulasi Akreditasi</h1>
+    <button id="btn-kembali" style="display: none"><span>Kembali</span></button>
+</center>
+
+<div data-role="collapsible" data-collapsed="false" id="riwayat-simulasi">
     <h4>Riwayat dan Rekapitulasi Hasil Simulasi</h4>
     <div data-role="tabs" id="tabs">
         <div data-role="navbar">
@@ -187,6 +192,11 @@
 @section('sim-js')
 <script>
     $(document).ready(function(){
+        $('#btn-kembali').show();
+            $('#btn-kembali').click(function(){
+                window.location.href = "{{route('simulation.index')}}";
+            })
+
         @foreach ($simulationsResults as $simulationResult)
         $('#btn-del-{{$loop->iteration}}').click(function(){
             $.ajax({
