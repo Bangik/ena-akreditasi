@@ -1,4 +1,45 @@
 @extends('layouts.simulation.app')
+@section('sim-css')
+<style>
+    .menu {
+    color:#000000;
+    position:relative;
+    left:0px;
+    width:100%;
+    }
+    .fixed {
+        position:fixed;
+        top:0;
+        z-index:3;
+    }
+
+    .menu2 {
+    color:#000000;
+    position:relative;
+    left:0px;
+    width:100%;
+    }
+
+    .fixed2 {
+        position:fixed;
+        top:35px;
+        z-index:3;
+    }
+    
+    .clicked-up {
+    background-color: #388ccc!important;
+    color: #fff !important;
+    text-shadow: none !important;
+    }
+
+    .clicked-left {
+    background-color: #f4f4f4!important;
+    border-color: #f4f4f4 !important;
+    color: black !important;
+    text-shadow: none !important;
+    }
+</style>
+@endsection
 @section('sim-main')
 
 <center>
@@ -11,9 +52,9 @@
     <div data-role="tabs" id="tabs">
         <div data-role="navbar">
             <ul>
-                <li><a href="#simulation-score-result" data-ajax="false" class="ui-btn-active">Hasil Simulasi Nilai</a></li>
-                <li><a href="#simulation-doc-result" data-ajax="false">Hasil Simulasi Dokumen</a></li>
-                <li><a href="#simulation-recap" data-ajax="false">Rekapitulasi</a></li>
+                <li><a href="#simulation-score-result" id="btn-simulation-score-result" data-ajax="false" class="ui-btn-active">Hasil Simulasi Nilai</a></li>
+                <li><a href="#simulation-doc-result" id="btn-simulation-doc-result" data-ajax="false">Hasil Simulasi Dokumen</a></li>
+                <li><a href="#simulation-recap" id="btn-simulation-recap" data-ajax="false">Rekapitulasi</a></li>
             </ul>
         </div>
         <div id="simulation-score-result" class="ui-body-d ui-content">
@@ -21,7 +62,7 @@
                 <div data-role="navbar">
                     <ul>
                         @foreach ($simulationScores as $key => $simulationScore)
-                            <li><a href="#simulation-score-result-{{ $loop->iteration }}" data-ajax="false" class="{{$loop->iteration == 1 ? 'ui-btn-active' : ''}}">{{ $key }}</a></li>
+                            <li><a href="#simulation-score-result-{{ $loop->iteration }}" id="btn-simulation-score-result-{{ $loop->iteration }}" data-ajax="false" class="{{$loop->iteration == 1 ? 'ui-btn-active' : ''}}">{{ $key }}</a></li>
                         @endforeach
                     </ul>
                 </div>
@@ -78,7 +119,7 @@
                 <div data-role="navbar">
                     <ul>
                         @foreach ($simulationDocDetails as $key => $simulationDocDetail)
-                        <li><a href="#simulation-doc-result-{{$loop->iteration}}" data-ajax="false" class="{{$loop->iteration == 1 ? 'ui-btn-active' : ''}}">{{$key}}</a></li>
+                        <li><a href="#simulation-doc-result-{{$loop->iteration}}" id="btn-simulation-doc-result-{{$loop->iteration}}" data-ajax="false" class="{{$loop->iteration == 1 ? 'ui-btn-active' : ''}}">{{$key}}</a></li>
                         @endforeach
                     </ul>
                 </div>
@@ -196,6 +237,57 @@
             $('#btn-kembali').click(function(){
                 window.location.href = "{{route('simulation.index')}}";
             })
+
+        $('#btn-simulation-score-result').click(function(){
+            $('#btn-simulation-doc-result').removeClass('clicked-up');
+            $('#btn-simulation-doc-result').removeClass('clicked-left');
+
+            $('#btn-simulation-recap').removeClass('clicked-up');
+            $('#btn-simulation-recap').removeClass('clicked-left');
+
+            $(this).addClass('clicked-up');
+        });
+
+        $('#btn-simulation-doc-result').click(function(){
+            $('#btn-simulation-score-result').removeClass('clicked-up');
+            $('#btn-simulation-score-result').removeClass('clicked-left');
+            
+            $('#btn-simulation-recap').removeClass('clicked-up');
+            $('#btn-simulation-recap').removeClass('clicked-left');
+
+            $(this).addClass('clicked-up');
+        });
+
+        $('#btn-simulation-recap').click(function(){
+            $('#btn-simulation-score-result').removeClass('clicked-up');
+            $('#btn-simulation-score-result').removeClass('clicked-left');
+
+            $('#btn-simulation-doc-result').removeClass('clicked-up');
+            $('#btn-simulation-doc-result').removeClass('clicked-left');
+
+            $(this).addClass('clicked-up');
+        });
+
+        //looping
+        @foreach ($simulationScores as $key => $simulationScore)
+        $('#btn-simulation-score-result-{{ $loop->iteration }}').click(function(){
+            @foreach ($simulationScores as $key => $simulationScore)
+            $('#btn-simulation-score-result-{{ $loop->iteration }}').removeClass('clicked-up');
+            $('btn-simulation-score-result-{{ $loop->iteration }}').removeClass('clicked-left');
+            @endforeach
+            $(this).addClass('clicked-up');
+        });
+        @endforeach
+
+        @foreach ($simulationDocDetails as $key => $simulationDocDetail)
+        $('#btn-simulation-doc-result-{{$loop->iteration}}').click(function(){
+            @foreach ($simulationDocDetails as $key => $simulationDocDetail)
+            $('#btn-simulation-doc-result-{{$loop->iteration}}').removeClass('clicked-up');
+            $('#btn-simulation-doc-result-{{$loop->iteration}}').removeClass('clicked-left');
+            @endforeach
+            $(this).addClass('clicked-up');
+        });
+        @endforeach
 
         @foreach ($simulationsResults as $simulationResult)
         $('#btn-del-{{$loop->iteration}}').click(function(){
