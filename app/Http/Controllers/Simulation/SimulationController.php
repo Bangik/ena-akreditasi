@@ -36,7 +36,6 @@ class SimulationController extends Controller
 
     public function store(Request $request)
     {
-        // $weight_comp = 
         // tabel simulasi
         $weight = Scoretype::get('weight');
         $timeNow = Carbon::now($request->timezone)->format('Y-m-d H:i:s');
@@ -75,6 +74,14 @@ class SimulationController extends Controller
             $score_comp = 0;
             // insert tabel simulasi score detail / simulation_details
             foreach($request->nilai[$value] as $key2 => $value2){
+                if($value2 > 4){
+                    $simulation->delete();
+                    return response()->json([
+                        'code' => '400',
+                        'status' => 'error',
+                        'message' => 'Nilai tidak boleh lebih dari 4',
+                    ]);
+                }
                 SimulationScoreDetail::create([
                     'id' => 'sim.2.'.$key.'.'.$key2 . Str::random(10),
                     'parent_id' => $scores->id,
@@ -190,6 +197,8 @@ class SimulationController extends Controller
         // return redirect()->route('simulation.index');
         return response()->json([
             'status' => 'success',
+            'code' => '200',
+            'message' => 'Simulasi berhasil disimpan',
         ]);
 
         // return $request->all();
@@ -249,6 +258,7 @@ class SimulationController extends Controller
         // return redirect()->route('simulation.index');
         return response()->json([
             'status' => 'success',
+            'message' => 'Data berhasil dihapus'
         ]);
     }
 }

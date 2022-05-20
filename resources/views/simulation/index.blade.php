@@ -191,7 +191,11 @@
                 type: 'POST',
                 data: $('#form').serialize(),
                 success: function(data) {
-                    window.location.href = "{{route('simulation.resultBasedOnQuestion')}}";
+                    if (data.status == 'success') {
+                        window.location.href = "{{route('simulation.resultBasedOnQuestion')}}";
+                    } else {
+                        alert(data.message);
+                    }
                 }
             });
         });
