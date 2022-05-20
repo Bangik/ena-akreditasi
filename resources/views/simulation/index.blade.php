@@ -19,10 +19,24 @@
     left:0px;
     width:100%;
     }
+
     .fixed2 {
         position:fixed;
         top:35px;
         z-index:3;
+    }
+    
+    .clicked-up {
+    background-color: #388ccc!important;
+    color: #fff !important;
+    text-shadow: none !important;
+    }
+
+    .clicked-left {
+    background-color: #f4f4f4!important;
+    border-color: #f4f4f4 !important;
+    color: black !important;
+    text-shadow: none !important;
     }
 </style>
 @endsection
@@ -36,10 +50,10 @@
     </center>
    
     <div data-role="tabs" id="tabs-simulation" style="display: none">
-        <div data-role="navbar" class="menu">
+        <div data-role="navbar" class="menu" id="navbar-simulation">
             <ul>
-                <li><a href="#one" class="ui-btn-active">Simulasi Nilai</a></li>
-                <li><a href="#two">Simulasi Kelengkapan Dokumen</a></li>
+                <li><a href="#one" id="btn-one" class="ui-btn-active">Simulasi Nilai</a></li>
+                <li><a href="#two" id="btn-two"> Kelengkapan Dokumen</a></li>
             </ul>
         </div>
         
@@ -55,7 +69,7 @@
                             <li>
                                 <input type="hidden" name="scoretypeComponentId[]" value="{{$scoretypeComponent->id}}">
                                 <input type="hidden" name="weightComp[]" value="{{$scoretypeComponent->weight}}">
-                                <a href="#satu-{{$loop->iteration}}" class="{{$loop->iteration == 1 ? 'ui-btn-active' : ''}}">{{$scoretypeComponent->name}}</a>
+                                <a href="#satu-{{$loop->iteration}}" id="btn-satu-{{$loop->iteration}}" class="btn-satu {{$loop->iteration == 1 ? 'ui-btn-active' : ''}}">{{$scoretypeComponent->name}}</a>
                             </li>
                         @endforeach
                         </ul>
@@ -104,7 +118,7 @@
                         <ul>
                         @foreach ($scoretypeComponents as $scoretypeComponent)
                         <!-- TAB KOMPONEN -->
-                        <li><a href="#siji-{{$loop->iteration}}" class="{{$loop->iteration == 1 ? 'ui-btn-active' : ''}}">{{$scoretypeComponent->name}}</a></li>
+                        <li><a href="#siji-{{$loop->iteration}}" id="btn-siji-{{$loop->iteration}}" class="{{$loop->iteration == 1 ? 'ui-btn-active' : ''}}">{{$scoretypeComponent->name}}</a></li>
                         @endforeach
                         </ul>
                     </div>
@@ -115,7 +129,7 @@
                             @foreach ($scoretypeComponent->componentQuestions as $componentQuestion)
                             <div class="ui-bar ui-bar-a">
                                 <!-- PERTANYAAN -->
-                                {{$loop->iteration}}. {{$componentQuestion->name}}
+                                <p>{{$loop->iteration}}. {{$componentQuestion->name}}</p>
                                 <div class="ui-body ui-body-a">
                                     <div class="ui-bar ui-bar-a">Indikator</div>
                                     @foreach ($componentQuestion->questionsIndicators as $questionsIndicator)
@@ -142,16 +156,16 @@
                     @endforeach
                 </div>
             </div>
-
-            <!-- Tombol Tambah Data -->
-            <div data-role="footer" data-position="fixed" style="position:fixed">
-                <div data-role="navbar">
-                    <ul>
-                        <li><button type="button" data-icon="check" data-class="ui-btn" id="btn-simpan">Simpan</button></li>
-                    </ul>
-                </div>  
-            </div>
         </form>
+
+        <!-- Tombol Tambah Data -->
+        <div data-role="footer" data-position="fixed" style="position:fixed">
+            <div data-role="navbar">
+                <ul>
+                    <li><button type="button" data-icon="check" data-class="ui-btn" id="btn-simpan">Simpan</button></li>
+                </ul>
+            </div>  
+        </div>
     </div>
     
 @endsection
@@ -195,6 +209,39 @@
                 }
             });
         });
+
+        $('#btn-one').click(function(){
+            $('#btn-two').removeClass('clicked-up');
+            $('#btn-two').removeClass('clicked-left');
+            $(this).addClass('clicked-up');
+        });
+
+        $('#btn-two').click(function(){
+            $('#btn-one').removeClass('clicked-up');
+            $('#btn-one').removeClass('clicked-left');
+            $(this).addClass('clicked-up');
+        });
+        
+        //looping
+        @foreach ($scoretypeComponents as $scoretypeComponent)
+        $('#btn-satu-{{$loop->iteration}}').click(function(){
+            @foreach ($scoretypeComponents as $scoretypeComponent)
+            $('#btn-satu-{{$loop->iteration}}').removeClass('clicked-up');
+            $('#btn-satu-{{$loop->iteration}}').removeClass('clicked-left');
+            @endforeach
+            $(this).addClass('clicked-up');
+        });
+
+        $('#btn-siji-{{$loop->iteration}}').click(function(){
+            @foreach ($scoretypeComponents as $scoretypeComponent)
+            $('#btn-siji-{{$loop->iteration}}').removeClass('clicked-up');
+            $('#btn-siji-{{$loop->iteration}}').removeClass('clicked-left');
+            @endforeach
+            $(this).addClass('clicked-up');
+        });
+        @endforeach
+
+        
 
         var num = 200; //number of pixels before modifying styles
 
