@@ -24,7 +24,7 @@ class SimulationDocIndic extends Model
 
     public function simulationDocument()
     {
-        return $this->belongsTo(SimulationDocument::class, 'parent_id', 'id');
+        return $this->belongsTo(SimulationScore::class, 'parent_id', 'id');
     }
 
     public function questionIndicator()

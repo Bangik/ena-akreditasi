@@ -101,7 +101,7 @@
                                     <div class="ui-bar ui-bar-a">Indikator</div>
                                     <!-- INDIKATOR -->
                                     @foreach ($componentQuestion->questionsIndicators as $questionsIndicator)
-                                        <p style="font-weight:normal!important;">{{$loop->iteration}}. {{$questionsIndicator->name}}</p>
+                                        <p style="font-weight:normal!important;">{{$loop->iteration}}. {!!$questionsIndicator->name!!}</p>
                                     @endforeach
                                 </div>
                             </div>
@@ -118,15 +118,18 @@
                         <ul>
                         @foreach ($scoretypeComponents as $scoretypeComponent)
                         <!-- TAB KOMPONEN -->
+                        @if($loop->iteration != 5)
                         <li><a href="#siji-{{$loop->iteration}}" id="btn-siji-{{$loop->iteration}}" class="{{$loop->iteration == 1 ? 'ui-btn-active' : ''}}">{{$scoretypeComponent->name}}</a></li>
+                        @endif
                         @endforeach
                         </ul>
                     </div>
 
                     @foreach ($scoretypeComponents as $scoretypeComponent)
+                    @if($loop->iteration != 5)
                     <div id="siji-{{$loop->iteration}}">
                         <div class="ui-corner-all custom-corners">
-                            @foreach ($scoretypeComponent->componentQuestions as $componentQuestion)
+                            @foreach ($scoretypeComponent->componentQuestions->sortBy('seq') as $componentQuestion)
                             <div class="ui-bar ui-bar-a">
                                 <!-- PERTANYAAN -->
                                 <p>{{$loop->iteration}}. {{$componentQuestion->name}}</p>
@@ -135,7 +138,8 @@
                                     @foreach ($componentQuestion->questionsIndicators as $questionsIndicator)
                                         <input type="hidden" name="questionIndicatorsId[{{$scoretypeComponent->id}}][]" value="{{$questionsIndicator->id}}">
                                         <!-- INDIKATOR -->
-                                        <p style="font-weight:normal!important;">{{$loop->iteration}}. {{$questionsIndicator->name}}</p>
+                                        <p style="font-weight:normal!important;">{{$loop->iteration}}. {!!$questionsIndicator->name!!}</p>
+                                        @if($questionsIndicator->indicatorsDocuments->count() != 0)
                                         <div class="ui-corner-all custom-corners">
                                             <div class="ui-bar ui-bar-a">Dokumen</div>
                                                 <!-- INDIKATOR -->
@@ -147,12 +151,14 @@
                                                     </label>
                                                 @endforeach
                                         </div>
+                                        @endif
                                     @endforeach
                                 </div>
                             </div>
                             @endforeach
                         </div>
                     </div>
+                    @endif
                     @endforeach
                 </div>
             </div>
@@ -268,6 +274,12 @@
                 $('.menu2').removeClass('fixed2');
             }
         });
+
+        $('.nilais').keyup(function(){
+            if($(this).val() > 4){
+                $(this).val('1');
+            }
+        })
     });
 </script>
 @endsection

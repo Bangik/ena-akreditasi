@@ -137,9 +137,9 @@
                             <tr>
                                 <th colspan="2">Jumlah Skor Dokumen</th>
                                 @foreach ($simulationsResults as $simulationsResultDoc)
-                                @foreach ($simulationsResultDoc->scoreDoc as $scores)
-                                    @if ($scores->scoretypeComponent->name == $key)
-                                    <th>{{$scores->score}} / {{$scores->score_max}}</th>
+                                @foreach ($simulationsResultDoc->scores as $scores)
+                                    @if ($scores->scoretype_component->name == $key)
+                                    <th>{{$scores->score_doc}} / {{$scores->score_doc_max}}</th>
                                     @endif
                                     @endforeach
                                 @endforeach
@@ -203,15 +203,13 @@
                     <tr>
                         <td>{{$loop->iteration}}</td>
                         <td>{{Carbon\Carbon::parse($simulationResult->created_on)->format('d M Y H:i')}}</td>
-                        {{-- @dd($simulationResult->toArray()) --}}
                         @foreach ($simulationResult->scores as $key => $scores)
-                        {{-- @dd($simulationResult->scoreDoc[$key]->toArray()) --}}
                         <td>
                             <p class="font-weight-bold">Nilai : </p>
                             {{$scores->score}} / {{$scores->score_max}}
                             <br>
                             <p class="font-weight-bold">Skor Dok : </p>
-                            {{$simulationResult->scoreDoc[$key]->score}} / {{$simulationResult->scoreDoc[$key]->score_max}}
+                            {{$scores->score_doc}} / {{$scores->score_doc_max}}
                         </td>
                         @endforeach
                         <td>{{$simulationResult->na}}</td>
