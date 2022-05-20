@@ -9,7 +9,7 @@ class SimulationScore extends Model
 {
     use HasFactory;
     protected $table = 'simulations_score';
-    protected $fillable = ['id', 'parent_id', 'scoretype_component_id', 'score', 'score_max', 'score_comp','created_on', 'modified_on'];
+    protected $fillable = ['id', 'parent_id', 'scoretype_component_id', 'score', 'score_max', 'score_doc', 'score_doc_max', 'score_comp','created_on', 'modified_on'];
     public $timestamps = false;
     public $keyType = 'string';
     public $incrementing = false;
@@ -27,5 +27,10 @@ class SimulationScore extends Model
     public function simulationDetails()
     {
         return $this->hasMany(SimulationScoreDetail::class, 'parent_id', 'id');
+    }
+
+    public function simulationDocIndic()
+    {
+        return $this->hasMany(SimulationDocIndic::class, 'parent_id', 'id');
     }
 }

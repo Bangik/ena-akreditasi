@@ -32,9 +32,4 @@ class Simulation extends Model
     {
         return $this->hasMany(SimulationScore::class, 'parent_id', 'id');
     }
-
-    public function scoreDoc()
-    {
-        return $this->hasMany(SimulationDocument::class, 'parent_id', 'id');
-    }
 }

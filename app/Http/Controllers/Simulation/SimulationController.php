@@ -27,7 +27,7 @@ class SimulationController extends Controller
             'componentQuestions.questionsIndicators.indicatorsDocuments',
             )->get();
         $dataComponentQuestions = ComponentsQuestions::with('questionsIndicators.indicatorsDocuments')->get();
-        // dd($scoretypeComponents->toArray());
+        // dd($scoretypeComponents[1]->toArray());
         return view('simulation.index', compact(
             'scoretypeComponents',
             'dataComponentQuestions',
@@ -101,31 +101,10 @@ class SimulationController extends Controller
             if($key != count($request->weightComp) - 1){
                 $total_score_comp += $score_comp;
             }
-
-            SimulationScore::where('id', $scores->id)->update([
-                'score' => $score,
-                'score_max' => $score_max,
-                'score_comp' => $score_comp,
-            ]);
-
-            $total_score += $score;
-            $total_score_max += $score_max;
-
+            
             ////////////////////////////////////////////////////////////////
 
             // insert ke tabel simulation_document
-            $simDoc = SimulationDocument::create([
-                'id' => 'sim.2.'.$key . Str::random(10),
-                'parent_id' => $simulation->id,
-                'scoretype_component_id' => $value,
-                'score' => 1,
-                'score_max' => 1,
-                'created_on' => $timeNow,
-                'created_by' => 1,
-                'modified_on' => $timeNow,
-                'modified_by' => 1,
-            ]);
-
             $score_sim_doc = 0;
             $score_sim_doc_max = 0;
 
@@ -134,10 +113,8 @@ class SimulationController extends Controller
 
                     $simDocIndic = SimulationDocIndic::create([
                         'id' => 'sim.2.'.$key . Str::random(10),
-                        'parent_id' => $simDoc->id,
+                        'parent_id' => $scores->id,
                         'questions_indicator_id' => $value2,
-                        'score' => 1,
-                        'score_max' => 1,
                         'created_on' => $timeNow,
                         'created_by' => 1,
                         'modified_on' => $timeNow,
@@ -171,10 +148,17 @@ class SimulationController extends Controller
                     $score_sim_doc_max += $score_sim_doc_indic_max;
                 }
             }
-            SimulationDocument::where('id', $simDoc->id)->update([
-                'score' => $score_sim_doc,
-                'score_max' => $score_sim_doc_max,
+            
+            SimulationScore::where('id', $scores->id)->update([
+                'score' => $score,
+                'score_max' => $score_max,
+                'score_doc' => $score_sim_doc,
+                'score_doc_max' => $score_sim_doc_max,
+                'score_comp' => $score_comp,
             ]);
+
+            $total_score += $score;
+            $total_score_max += $score_max;
 
             $score_doc += $score_sim_doc;
             $score_doc_max += $score_sim_doc_max;
@@ -210,10 +194,9 @@ class SimulationController extends Controller
             'scores.scoretype_component',
             'scores.simulationDetails.component_questions.questionsAnswers',
             'scores.simulationDetails.component_questions.questionsIndicators',
-            'scoreDoc.scoretypeComponent',
-            'scoreDoc.scoretypeComponent.componentQuestions.questionsIndicators',
-            'scoreDoc.simulationDocIndic.simulationDocDetail.simulationIndicatorsDocument',
-            'scoreDoc.simulationDocIndic.questionIndicator.indicatorsDocuments',
+            'scores.scoretype_component.componentQuestions.questionsIndicators',
+            'scores.simulationDocIndic.simulationDocDetail.simulationIndicatorsDocument',
+            'scores.simulationDocIndic.questionIndicator.indicatorsDocuments',
         )
         ->find($id);
         // dd($simulations->toArray());
@@ -232,10 +215,7 @@ class SimulationController extends Controller
             'scores.scoretype_component',
             'scores.simulationDetails.component_questions.questionsAnswers',
             'scores.simulationDetails.component_questions.questionsIndicators',
-            'scoreDoc.scoretypeComponent',
-            // 'scoreDoc.scoretypeComponent.componentQuestions.questionsIndicators',
-            'scoreDoc.simulationDocIndic.simulationDocDetail',
-            // 'scoreDoc.simulationDocIndic.questionIndicator.indicatorsDocuments',
+            'scores.simulationDocIndic.simulationDocDetail',
         )
         ->get()
         ->sortByDesc('created_on');

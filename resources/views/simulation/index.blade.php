@@ -129,7 +129,7 @@
                     @if($loop->iteration != 5)
                     <div id="siji-{{$loop->iteration}}">
                         <div class="ui-corner-all custom-corners">
-                            @foreach ($scoretypeComponent->componentQuestions as $componentQuestion)
+                            @foreach ($scoretypeComponent->componentQuestions->sortBy('seq') as $componentQuestion)
                             <div class="ui-bar ui-bar-a">
                                 <!-- PERTANYAAN -->
                                 <p>{{$loop->iteration}}. {{$componentQuestion->name}}</p>
@@ -277,6 +277,12 @@
                 $('.menu2').removeClass('fixed2');
             }
         });
+
+        $('.nilais').keyup(function(){
+            if($(this).val() > 4){
+                $(this).val('1');
+            }
+        })
     });
 </script>
 @endsection

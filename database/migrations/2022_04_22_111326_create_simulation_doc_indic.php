@@ -16,7 +16,7 @@ class CreateSimulationDocIndic extends Migration
         Schema::create('simulation_doc_indic', function (Blueprint $table) {
             $table->string('id', 25)->primary();
             $table->string('parent_id', 25);
-            $table->foreign('parent_id')->references('id')->on('simulation_documents')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('parent_id')->references('id')->on('simulations_score')->onUpdate('cascade')->onDelete('cascade');
             $table->string('questions_indicator_id', 25);
             $table->foreign('questions_indicator_id')->references('id')->on('questions_indicators')->onUpdate('cascade')->onDelete('cascade');
             $table->smallInteger('score')->nullable();
