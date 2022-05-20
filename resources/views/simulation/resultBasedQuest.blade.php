@@ -62,6 +62,7 @@
                 <div data-role="navbar">
                     <ul>
                         @foreach ($simulationScores as $key => $simulationScore)
+                        
                             <li><a href="#simulation-score-result-{{ $loop->iteration }}" id="btn-simulation-score-result-{{ $loop->iteration }}" data-ajax="false" class="{{$loop->iteration == 1 ? 'ui-btn-active' : ''}}">{{ $key }}</a></li>
                         @endforeach
                     </ul>
