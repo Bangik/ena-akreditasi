@@ -90,7 +90,7 @@
                                         </div>
                                         <div class="ui-block-b">
                                             <div class="ui-bar ui-bar-a" style="text-align: right">Nilai (1-4) &nbsp
-                                                <input type="number" data-clear-btn="false" data-role="none" name="nilai[{{$scoretypeComponent->id}}][]" min="1" max="4" style="height: 15px; width:50px; float:right">
+                                                <input type="number" data-clear-btn="false" data-role="none" class="nilais" name="nilai[{{$scoretypeComponent->id}}][]" min="1" max="4" style="height: 15px; width:50px; float:right">
                                             </div>
                                         </div>
                                     </div>
@@ -198,6 +198,10 @@
             })
 
         $("#btn-simpan").click(function() {
+            if($('.nilais').val() > 4){
+                alert('Nilai tidak boleh lebih dari 4');
+                return false;
+            }
             // to each unchecked checkbox
             $('#form').find('input[type=checkbox]:not(:checked)').prop('checked', true).val(0);
             $.ajax({
