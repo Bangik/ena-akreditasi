@@ -50,7 +50,7 @@
     </center>
    
     <div data-role="tabs" id="tabs-simulation" style="display: none">
-        <div data-role="navbar" class="menu" id="navbar-simulation">
+        <div data-role="navbar" class="menu">
             <ul>
                 <li><a href="#one" id="btn-one" class="ui-btn-active">Simulasi Nilai</a></li>
                 <li><a href="#two" id="btn-two"> Kelengkapan Dokumen</a></li>

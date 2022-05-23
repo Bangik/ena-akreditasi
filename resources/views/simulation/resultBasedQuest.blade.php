@@ -152,7 +152,7 @@
                                 <tr>
                                     <td>{{$loop->iteration}}</td>
                                     <td>
-                                        {{$key2}}
+                                        {!!$key2!!}
                                         <br>
                                         <p style="font-weight: 300; margin-top: 3px; margin-bottom: 3px;">Dokumen</p>
                                         @foreach ($value->groupBy('simulationIndicatorsDocument.id') as $document)
