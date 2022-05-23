@@ -72,19 +72,19 @@
             <div data-role="tabs" id="tabs2">
                 <div data-role="navbar">
                     <ul>
-                    @foreach ($simulations->scoreDoc as $scoreDoc)
+                    @foreach ($simulations->scores as $scoreDoc)
                         <!-- TAB KOMPONEN -->
                         <li>
-                            <a href="#siji-{{$loop->iteration}}">{{$scoreDoc->scoretypeComponent->name}}</a>
+                            <a href="#siji-{{$loop->iteration}}">{{$scoreDoc->scoretype_component->name}}</a>
                         </li>
                     @endforeach
                     </ul>
                 </div>
 
-                @foreach ($simulations->scoreDoc as $scoreDoc)
+                @foreach ($simulations->scores as $scoreDoc)
                 <div id="siji-{{$loop->iteration}}">
                     <div class="ui-corner-all custom-corners">
-                        @foreach ($scoreDoc->scoretypeComponent->componentQuestions as $componentQuestions)           
+                        @foreach ($scoreDoc->scoretype_component->componentQuestions as $componentQuestions)           
                         <div class="ui-bar ui-bar-a">
                         <!-- PERTANYAAN -->
                             {{$loop->iteration}}. {{$componentQuestions->name}}
