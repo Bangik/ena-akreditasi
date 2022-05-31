@@ -90,17 +90,18 @@
                                         </div>
                                         <div class="ui-block-b">
                                             <div class="ui-bar ui-bar-a" style="text-align: right">Nilai (1-4) &nbsp
-                                                <input type="number" data-clear-btn="false" data-role="none" class="nilai" name="nilai[{{$scoretypeComponent->id}}][]" min="1" max="4" style="height: 15px; width:50px; float:right">
+                                                <input type="number" data-clear-btn="false" data-role="none" class="nilais" name="nilai[{{$scoretypeComponent->id}}][]" min="1" max="4" style="height: 15px; width:50px; float:right">
                                             </div>
                                         </div>
                                     </div>
                                     @foreach ($componentQuestion->questionsAnswers->sortByDesc('level') as $questionsAnswer)
                                     <!-- JAWABAN -->
-                                    <fieldset data-role="controlgroup">
+                                    <p style="font-weight: normal!important">{{$questionsAnswer->level}}. {!!$questionsAnswer->name!!}</p>
+                                    {{-- <fieldset data-role="controlgroup">
                                         <label style="font-weight: normal!important">
                                             <input type="radio" name="{{$componentQuestion->seq}}" value="{{$questionsAnswer->level}}">{!!$questionsAnswer->name!!}
                                         </label>
-                                    </fieldset>
+                                    </fieldset> --}}
                                     @endforeach
                                     <div class="ui-bar ui-bar-a">Indikator</div>
                                     <!-- INDIKATOR -->
@@ -284,13 +285,7 @@
             if($(this).val() > 4){
                 $(this).val('1');
             }
-        })
-
-        @foreach ($componentQuestion->questionsAnswers->sortByDesc('level') as $questionsAnswer)
-        $('#btn-{{$questionsAnswer->level}}').click(function() {
-            $("input:radio:checked")[0].checked = false;
         });
-        @endforeach
     });
 </script>
 @endsection
