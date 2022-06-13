@@ -216,7 +216,11 @@
                         <td>{{$simulationResult->na}}</td>
                         <td>{{$simulationResult->rating}}</td>
                         <td>
+                            @if ($simulationResult->total_score < 44)
+                            <a href="{{ route('simulation.edit', ['id' => $simulationResult->id]) }}" target="_blank" class="ui-btn">Lanjutkan Pengisian</a>
+                            @else
                             <a href="{{ route('simulation.result', ['id' => $simulationResult->id]) }}" target="_blank" class="ui-btn">Lihat Hasil</a>
+                            @endif
                             <button type="button" class="ui-btn" id="btn-del-{{$loop->iteration}}">Hapus</button>
                         </td>
                     </tr>

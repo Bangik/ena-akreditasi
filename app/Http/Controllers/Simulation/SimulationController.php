@@ -40,6 +40,12 @@ class SimulationController extends Controller
         $weight = Scoretype::get('weight');
         $timeNow = Carbon::now($request->timezone)->format('Y-m-d H:i:s');
 
+        // jika edit
+        if($request->idSimulation != null || isset($request->idSimulation)){
+            $simulation = Simulation::find($request->idSimulation);
+            $simulation->delete();
+        }
+
         $simulation = Simulation::create([
             'id' => 'sim.'. Str::random(10),
             'created_on' => $timeNow,
@@ -203,6 +209,21 @@ class SimulationController extends Controller
         return view('simulation.result', compact('simulations'));
     }
 
+    public function edit($id)
+    {
+        $simulations = Simulation::with(
+            'scores.scoretype_component',
+            'scores.simulationDetails.component_questions.questionsAnswers',
+            'scores.simulationDetails.component_questions.questionsIndicators',
+            'scores.scoretype_component.componentQuestions.questionsIndicators',
+            'scores.simulationDocIndic.simulationDocDetail.simulationIndicatorsDocument',
+            'scores.simulationDocIndic.questionIndicator.indicatorsDocuments',
+        )
+        ->find($id);
+        // dd($simulations->toArray());
+        return view('simulation.edit', compact('simulations'));
+    }
+
     public function resultBasedOnQuestion(){
         $simulationScores = SimulationScoreDetail::with(
             'component_questions.questionsAnswers',
@@ -226,8 +247,6 @@ class SimulationController extends Controller
         ->get()
         ->sortBy('simulationIndicatorsDocument.indicatorsQuestions.componentQuestions.scoretypeComponents.id')
         ->groupBy('simulationIndicatorsDocument.indicatorsQuestions.componentQuestions.scoretypeComponents.name');
-        // dd($simulationDocs->toArray());
-        // dd($simulationDocDetails->toArray());
         return view('simulation.resultBasedQuest', compact('simulationScores', 'simulationsResults','simulationDocDetails'));
     }
 
