@@ -69,7 +69,7 @@
                 </div>
                 @foreach ($simulationScores as $key => $simulationScore)
                 <div id="simulation-score-result-{{$loop->iteration}}" class="ui-body-d ui-content">
-                    <table data-role="table" id="temp-table" data-mode="reflow" class="ui-responsive table-stroke">
+                    <table data-role="table" id="temp-table" class="ui-responsive table-stroke">
                         <thead>
                             <tr>
                                 <th>No</th>
@@ -216,7 +216,11 @@
                         <td>{{$simulationResult->na}}</td>
                         <td>{{$simulationResult->rating}}</td>
                         <td>
+                            @if ($simulationResult->total_score < 44)
+                            <a href="{{ route('simulation.edit', ['id' => $simulationResult->id]) }}" target="_blank" class="ui-btn"><i class="fas fa-exclamation-triangle" style="color: #ffc107"></i> Lanjutkan Pengisian</a>
+                            @else
                             <a href="{{ route('simulation.result', ['id' => $simulationResult->id]) }}" target="_blank" class="ui-btn">Lihat Hasil</a>
+                            @endif
                             <button type="button" class="ui-btn" id="btn-del-{{$loop->iteration}}">Hapus</button>
                         </td>
                     </tr>

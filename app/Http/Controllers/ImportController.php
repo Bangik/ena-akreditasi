@@ -6,10 +6,6 @@ use App\Imports\ComponentsQuestionsImport;
 use App\Imports\IndicatorsDocumentsImport;
 use App\Imports\QuestionsAnswersImport;
 use App\Imports\QuestionsIndicatorsImport;
-use App\Models\Scoretype;
-use App\Models\Simulation;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 
 class ImportController extends Controller
@@ -57,47 +53,5 @@ class ImportController extends Controller
         } else {
             return redirect()->route('import.index')->with('error', 'Import Failed.');
         }
-    }
-
-    public function testing()
-    {
-        $data = Scoretype::with(
-            'scoretypeComponent',
-            'scoretypeComponent.componentQuestions',
-            'scoretypeComponent.componentQuestions.questionsAnswers',
-            'scoretypeComponent.componentQuestions.questionsIndicators',
-            'scoretypeComponent.componentQuestions.questionsIndicators.indicatorsDocuments'
-            )->get();
-        // $data = Scoretype::with('scoretypeComponent.componentQuestions')->get();
-        dd($data->toArray());
-        return view('testing', compact('data'));
-    }
-
-    public function testingApi()
-    {
-        $data = Scoretype::with(
-            'scoretypeComponent',
-            'scoretypeComponent.componentQuestions',
-            'scoretypeComponent.componentQuestions.questionsAnswers',
-            'scoretypeComponent.componentQuestions.questionsIndicators',
-            'scoretypeComponent.componentQuestions.questionsIndicators.indicatorsDocuments'
-            )->get();
-        // $data = Scoretype::with('scoretypeComponent.componentQuestions')->get();
-        // dd($data->toArray());
-        return response()->json($data);
-    }
-
-    public function testingSimulation()
-    {
-        // DB::enableQueryLog();
-        $data = Simulation::with(
-            'scores',
-            'scores.scoretype_component',
-            'scores.simulationDetails.component_questions',
-            'scoreDoc.simulationDocDetail.simulationIndicatorsDocument',
-        )->get();
-
-        dd($data->toArray());
-        return view('testing', compact('data'));
     }
 }
