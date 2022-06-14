@@ -47,8 +47,8 @@
 @section('sim-main')
 
     <center>
-    <h1>Hasil Simulasi Akreditasi</h1>
-    <h5>Tanggal {{Carbon\Carbon::parse($simulations->created_on)->format('d-M-Y H:i')}}</h5>
+    <h1>Lanjutkan Pengisian Simulasi Akreditasi</h1>
+    <h5>Tanggal {{Carbon\Carbon::parse($simulations->created_on)->format('d M Y H:i')}}</h5>
     <h6>Total Nilai : {{$simulations->total_score}} / {{$simulations->total_score_max}}</h6>
     <h6>Kelengkapan Dokumen : {{$simulations->score_doc}} / {{$simulations->score_doc_max}}</h6>
     </center>
@@ -69,22 +69,52 @@
             <div data-role="tabs" id="tabs1">
                 <div data-role="navbar" class="menu2">
                     <ul>
-                    @foreach ($simulations->scores as $simulationScore)
+                    @foreach ($simulations->scores->sortBy('scoretype_component_id') as $simulationScore)
                         <!-- TAB KOMPONEN -->
                         <li>
                             <input type="hidden" name="scoretypeComponentId[]" value="{{$simulationScore->scoretype_component->id}}">
                             <input type="hidden" name="weightComp[]" value="{{$simulationScore->scoretype_component->weight}}">
-                            <a href="#satu-{{$loop->iteration}}" id="btn-satu-{{$loop->iteration}}" class="btn-satu {{$loop->iteration == 1 ? 'ui-btn-active' : ''}}">{{$simulationScore->scoretype_component->name}}</a>
+                            <a href="#satu-{{$loop->iteration}}" id="btn-satu-{{$loop->iteration}}" class="btn-satu {{$loop->iteration == 1 ? 'ui-btn-active' : ''}}">
+                                @foreach ($simulationScore->simulationDetails as $simulation_detail)
+                                    @if ($simulation_detail->score == null)
+                                    <i class="fas fa-exclamation-triangle" style="color: #ffc107"></i>
+                                    @break
+                                    @endif
+                                @endforeach
+                                {{$simulationScore->scoretype_component->name}}
+                            </a>
                         </li>
                     @endforeach
                     </ul>
                 </div>
 
-                @foreach ($simulations->scores as $simulationScore)
+                @foreach ($simulations->scores->sortBy('scoretype_component_id') as $simulationScore)
                 <div id="satu-{{$loop->iteration}}">
                     <div class="ui-corner-all custom-corners">
                         <div class="ui-bar ui-bar-a">
                             <!-- PERTANYAAN -->
+                        @foreach ($simulationScore->simulationDetails as $simulation_detail)
+                        @if ($simulation_detail->score == null)
+                            <p>Pertanyaan yang masih belum diisi nilainya pada nomor:
+                            @break
+                        @endif
+                        @endforeach
+
+                        @foreach ($simulationScore->simulationDetails as $simulation_detail)
+                            @if ($simulation_detail->score == null)
+                                <span class="ui-btn-text">{{$loop->iteration}}</span>
+                            @endif
+                        @endforeach
+
+                        @foreach ($simulationScore->simulationDetails as $simulation_detail)
+                        @if ($simulation_detail->score == null)
+                            </p>
+                            <hr>
+                            <br>
+                            @break
+                        @endif
+                        @endforeach
+                        
                         @foreach ($simulationScore->simulationDetails as $simulation_detail)
                         {{-- @dd($simulation_detail->toArray()) --}}
                             <p>{{$loop->iteration}}. {{$simulation_detail->component_questions->name}}</p>
@@ -123,7 +153,7 @@
             <div data-role="tabs" id="tabs2">
                 <div data-role="navbar" class="menu2">
                     <ul>
-                    @foreach ($simulations->scores as $scoreDoc)
+                    @foreach ($simulations->scores->sortBy('scoretype_component_id') as $scoreDoc)
                         <!-- TAB KOMPONEN -->
                         @if($loop->iteration != 5)
                         <li>
@@ -134,7 +164,7 @@
                     </ul>
                 </div>
 
-                @foreach ($simulations->scores as $scoreDoc)
+                @foreach ($simulations->scores->sortBy('scoretype_component_id') as $scoreDoc)
                 @if($loop->iteration != 5)
                 <div id="siji-{{$loop->iteration}}">
                     <div class="ui-corner-all custom-corners">
@@ -258,8 +288,9 @@
         });
 
         $('.nilais').keyup(function(){
-            if($(this).val() > 4){
-                $(this).val('1');
+            if($(this).val() > 4 || $(this).val() < 1){
+                alert('Nilai tidak boleh lebih dari 4 atau lebih kecil dari 1');
+                $(this).val('');
             }
         });
     });

@@ -84,6 +84,11 @@
                                 <p>{{$componentQuestion->seq}}. {{$componentQuestion->name}}</p>
                                 <input type="hidden" name="componentQuestionId[{{$scoretypeComponent->id}}][]" value="{{$componentQuestion->id}}">
                                 <div class="ui-body ui-body-a">
+                                    <div class="ui-bar ui-bar-a">Indikator</div>
+                                    <!-- INDIKATOR -->
+                                    @foreach ($componentQuestion->questionsIndicators as $questionsIndicator)
+                                        <p style="font-weight:normal!important;">{{$loop->iteration}}. {!!$questionsIndicator->name!!}</p>
+                                    @endforeach
                                     <div class="ui-grid-a">
                                         <div class="ui-block-a">
                                             <div class="ui-bar ui-bar-a">Jawaban</div>
@@ -102,11 +107,6 @@
                                             <input type="radio" name="{{$componentQuestion->seq}}" value="{{$questionsAnswer->level}}">{!!$questionsAnswer->name!!}
                                         </label>
                                     </fieldset> --}}
-                                    @endforeach
-                                    <div class="ui-bar ui-bar-a">Indikator</div>
-                                    <!-- INDIKATOR -->
-                                    @foreach ($componentQuestion->questionsIndicators as $questionsIndicator)
-                                        <p style="font-weight:normal!important;">{{$loop->iteration}}. {!!$questionsIndicator->name!!}</p>
                                     @endforeach
                                 </div>
                             </div>
@@ -129,7 +129,40 @@
                         @endforeach
                         </ul>
                     </div>
-
+                    <br>
+                    Ambil data Dokumen dari Simulasi Lain
+                    <a href="#popupDialog" data-rel="popup" data-position-to="window" data-transition="pop" class="ui-btn ui-corner-all ui-shadow ui-btn-inline">Disini</a>
+                    <div data-role="popup" id="popupDialog" data-overlay-theme="b" data-dismissible="false" style="width: 800px;">
+                        <div data-role="header" data-theme="a">
+                            <h1>Ambil data dokumen</h1>
+                        </div>
+                        <div role="main" class="ui-content">
+                            <form id="form-doc-sim">
+                            @foreach ($dataDocumentSims as $dataDocumentSim)
+                                <label data-role="collapsible" data-collapsed-icon="carat-d" data-expanded-icon="carat-u">
+                                    <h4> Tanggal : {{Carbon\Carbon::parse($dataDocumentSim->created_on)->format('d M Y H:i')}}</h4>
+                                    @foreach ($dataDocumentSim->scores as $scoreDoc)
+                                        @if($loop->iteration != 5)
+                                        <h5 style="font-weight: bold;font-size: larger;margin: 0px;">{{$scoreDoc->scoretype_component->name}} ({{$scoreDoc->score_doc}} / {{$scoreDoc->score_doc_max}}) </h5>
+                                            @foreach ($scoreDoc->simulationDocIndic as $simulationDocIndic)
+                                                @foreach ($simulationDocIndic->simulationDocDetail as $indicatorsDocuments)
+                                                    @if ($indicatorsDocuments->is_checked == 1)
+                                                        <p style="font-weight: normal;">{{$indicatorsDocuments->simulationIndicatorsDocument->name}}</p>
+                                                    @endif
+                                                @endforeach
+                                            @endforeach
+                                        @endif
+                                    @endforeach
+                                    <input type="checkbox" value="{{$dataDocumentSim->id}}" name="dataDocSim[]" class="dataDocSim">
+                                </label>
+                            @endforeach
+                            </form>
+                            <a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline" data-rel="back" id="batal-ambil">Batal</a>
+                            <a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline" data-rel="back" id="ambil-data">Submit</a>
+                        </div>
+                    </div>
+                    <br>
+                    <br>
                     @foreach ($scoretypeComponents as $scoretypeComponent)
                     @if($loop->iteration != 5)
                     <div id="siji-{{$loop->iteration}}">
@@ -152,7 +185,7 @@
                                                 @foreach($questionsIndicator->indicatorsDocuments as $indicatorDocument)
                                                     <label>
                                                         <!-- INDIKATOR DOKUMEN -->
-                                                        <input type="checkbox" name="isChecked[{{$questionsIndicator->id}}][]" value="1">{{$indicatorDocument->name}}
+                                                        <input type="checkbox" name="isChecked[{{$questionsIndicator->id}}][]" value="1" data-checkbox-id="{{$indicatorDocument->id}}" class="checkbox-doc">{{$indicatorDocument->name}}
                                                         <input type="hidden" name="indicatorDocuments[{{$questionsIndicator->id}}][]" value="{{$indicatorDocument->id}}">
                                                     </label>
                                                 @endforeach
@@ -282,9 +315,36 @@
         });
 
         $('.nilais').keyup(function(){
-            if($(this).val() > 4){
-                $(this).val('1');
+            if($(this).val() > 4 || $(this).val() < 1){
+                alert('Nilai tidak boleh lebih dari 4 atau lebih kecil dari 1');
+                $(this).val('');
             }
+        });
+
+        $('#ambil-data').click(function(){
+            $.ajax({
+                url: "{{route('simulation.getDataDoc')}}",
+                type: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': "{{ csrf_token() }}"
+                },
+                data: {
+                    'dataDocSim': $('.dataDocSim:checked').serializeArray()
+                },
+                success: function(data) {
+                    if (data.status == 'success') {
+                        data.data.map(function(item){
+                            $("[data-checkbox-id='"+ item + "']").prop('checked', true).checkboxradio('refresh');
+                            $("[data-checkbox-id='"+ item + "']").attr('data-from-old', item);
+                        });
+                    } else {
+                        $('[data-from-old]').prop('checked', false).checkboxradio('refresh');
+                    }
+                },
+                error: function(data) {
+                    alert('Terjadi kesalahan');
+                }
+            });
         });
     });
 </script>
