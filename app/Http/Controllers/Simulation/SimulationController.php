@@ -49,6 +49,7 @@ class SimulationController extends Controller
         // jika edit
         if($request->idSimulation != null || isset($request->idSimulation)){
             $simulation = Simulation::find($request->idSimulation);
+            $timeNow = $simulation->created_on;
             $simulation->delete();
         }
 
@@ -258,7 +259,12 @@ class SimulationController extends Controller
         ->get()
         ->sortBy('simulationIndicatorsDocument.indicatorsQuestions.componentQuestions.scoretypeComponents.id')
         ->groupBy('simulationIndicatorsDocument.indicatorsQuestions.componentQuestions.scoretypeComponents.name');
-        return view('simulation.resultBasedQuest', compact('simulationScores', 'simulationsResults','simulationDocDetails'));
+
+        return view('simulation.resultBasedQuest', compact(
+            'simulationScores',
+            'simulationsResults',
+            'simulationDocDetails'
+        ));
     }
 
     public function getDataDoc(Request $request){

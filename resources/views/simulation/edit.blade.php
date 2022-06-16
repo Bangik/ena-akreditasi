@@ -45,13 +45,26 @@
 </style>
 @endsection
 @section('sim-main')
-
-    <center>
-    <h1>Lanjutkan Pengisian Simulasi Akreditasi</h1>
-    <h5>Tanggal {{Carbon\Carbon::parse($simulations->created_on)->format('d M Y H:i')}}</h5>
-    <h6>Total Nilai : {{$simulations->total_score}} / {{$simulations->total_score_max}}</h6>
-    <h6>Kelengkapan Dokumen : {{$simulations->score_doc}} / {{$simulations->score_doc_max}}</h6>
-    </center>
+    <h1 style="text-align: center;">Lanjutkan Pengisian Simulasi Akreditasi</h1>
+    <table data-role="table" class="ui-responsive" style="width: 30%">
+        <thead>
+            <tr>
+                <th>Tanggal</th>
+                <td>:</td>
+                <td>{{Carbon\Carbon::parse($simulations->created_on)->format('d M Y H:i')}}</td>
+            </tr>
+            <tr>
+                <th>Total Nilai</th>
+                <td>:</td>
+                <td>{{$simulations->total_score}} / {{$simulations->total_score_max}}</td>
+            </tr>
+            <tr>
+                <th>Kelengkapan Dokumen</th>
+                <td>:</td>
+                <td>{{$simulations->score_doc}} / {{$simulations->score_doc_max}}</td>
+            </tr>
+        </thead>
+    </table>
 
     <!-- Button Simulasi Nilai dan Kelengkapan Dokumen -->
     <div data-role="tabs" id="tabs">

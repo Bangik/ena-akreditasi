@@ -38,14 +38,25 @@
     color: black !important;
     text-shadow: none !important;
     }
+
+    .overflow-auto{
+        overflow: auto;
+        white-space: nowrap;
+    }
 </style>
 @endsection
 @section('sim-main')
 
-<center>
-    <h1>Simulasi Akreditasi</h1>
+@if ($simulationsResults->count() <= 0)
+<div style="text-align: center;">
+    <h1>Data Hasil Simulasi Akreditasi Kosong</h1>
     <button id="btn-kembali" style="display: none"><span>Kembali</span></button>
-</center>
+</div>
+@else
+<div style="text-align: center;">
+    <h1>Riwayat dan Rekapitulasi Simulasi Akreditasi</h1>
+    <button id="btn-kembali" style="display: none"><span>Kembali</span></button>
+</div>
 
 <div data-role="collapsible" data-collapsed="false" id="riwayat-simulasi">
     <h4>Riwayat dan Rekapitulasi Hasil Simulasi</h4>
@@ -69,48 +80,52 @@
                 </div>
                 @foreach ($simulationScores as $key => $simulationScore)
                 <div id="simulation-score-result-{{$loop->iteration}}" class="ui-body-d ui-content">
-                    <table data-role="table" id="temp-table" class="ui-responsive table-stroke">
-                        <thead>
-                            <tr>
-                                <th>No</th>
-                                <th>Pertanyaan</th>
-                                @foreach ($simulationScore->sortByDesc('created_on')->groupBy('created_on') as $date => $value)
-                                <th>{{Carbon\Carbon::parse($date)->format('d M Y H:i')}}</th>
-                                @endforeach
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <th colspan="2">Jumlah skor perolehan visitasi komponen {{$key}}</th>
-                                @foreach ($simulationsResults as $simulationsResult)
-                                    @foreach ($simulationsResult->scores as $scores)
-                                    @if ($scores->scoretype_component->name == $key)
-                                    <th >{{$scores->score}} / {{$scores->score_max}}</th>
-                                    @endif
+                    <div class="overflow-auto">
+                        <table data-role="table" id="table-nilai-{{$loop->iteration}}" class="ui-responsive table-stroke display">
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>Pertanyaan</th>
+                                    @foreach ($simulationScore->sortByDesc('created_on')->groupBy('created_on') as $date => $value)
+                                    <th>{{Carbon\Carbon::parse($date)->format('d M y, H:i')}}</th>
                                     @endforeach
-                                @endforeach
-                            </tr>
-                            <tr>
-                                <th colspan="2">Skor Komponen / Skor Maks Komponen X Bobot</th>
-                                @foreach ($simulationsResults as $simulationsResult)
-                                    @foreach ($simulationsResult->scores as $scores)
-                                    @if ($scores->scoretype_component->name == $key)
-                                    <th>{{$scores->score_comp}}</th>
-                                    @endif
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Jumlah skor perolehan visitasi komponen {{$key}}</th>
+                                    @foreach ($simulationsResults as $simulationsResult)
+                                        @foreach ($simulationsResult->scores as $scores)
+                                        @if ($scores->scoretype_component->name == $key)
+                                        <th>{{$scores->score}} / {{$scores->score_max}}</th>
+                                        @endif
+                                        @endforeach
                                     @endforeach
+                                </tr>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Skor Komponen / Skor Maks Komponen X Bobot</th>
+                                    @foreach ($simulationsResults as $simulationsResult)
+                                        @foreach ($simulationsResult->scores as $scores)
+                                        @if ($scores->scoretype_component->name == $key)
+                                        <th>{{$scores->score_comp}}</th>
+                                        @endif
+                                        @endforeach
+                                    @endforeach
+                                </tr>
+                                @foreach ($simulationScore->sortBy('component_questions.seq')->groupBy('component_questions.name') as $keyName => $component_questions)
+                                <tr>
+                                    <td>{{$loop->iteration}}</td>
+                                    <td>{!!wordwrap($keyName, 70, '<br>')!!}</td>
+                                    @foreach ($component_questions->sortByDesc('created_on') as $score)
+                                        <td>{{$score->score == null ? 0 : $score->score}}</td>
+                                    @endforeach
+                                </tr>
                                 @endforeach
-                            </tr>
-                            @foreach ($simulationScore->sortBy('component_questions.seq')->groupBy('component_questions.name') as $keyName => $component_questions)
-                            <tr>
-                                <td>{{$loop->iteration}}</td>
-                                <td>{{$keyName}}</td>
-                                @foreach ($component_questions->sortByDesc('created_on') as $score)
-                                    <td>{{$score->score == null ? 0 : $score->score}}</td>
-                                @endforeach
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
                 @endforeach
             </div>
@@ -126,116 +141,131 @@
                 </div>
                 @foreach ($simulationDocDetails as $key => $simulationDocDetail)
                 <div id="simulation-doc-result-{{$loop->iteration}}" class="ui-body-d ui-content">
-                    <table data-role="table" id="table-simulation-doc-result" data-mode="reflow" class="ui-responsive table-stroke">
-                        <thead>
-                            <tr>
-                                <th>No</th>
-                                <th>Indikator dan Dokumen</th>
-                                @foreach ($simulationDocDetail->sortByDesc('created_on')->groupBy('created_on') as $date => $value)
-                                <th>{{Carbon\Carbon::parse($date)->format('d M Y H:i')}}</th>
-                                @endforeach
-                            </tr>
-                            <tr>
-                                <th colspan="2">Jumlah Skor Dokumen</th>
-                                @foreach ($simulationsResults as $simulationsResultDoc)
-                                @foreach ($simulationsResultDoc->scores as $scores)
-                                    @if ($scores->scoretype_component->name == $key)
-                                    <th>{{$scores->score_doc}} / {{$scores->score_doc_max}}</th>
-                                    @endif
-                                    @endforeach
-                                @endforeach
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tbody>
-                                @foreach ($simulationDocDetail->sortBy('simulationIndicatorsDocument.id')->groupBy('simulationIndicatorsDocument.indicatorsQuestions.name') as $key2 => $value)
+                    <div class="overflow-auto">
+                        <table data-role="table" id="table-doc-{{$loop->iteration}}" class="ui-responsive table-stroke display">
+                            <thead>
                                 <tr>
-                                    <td>{{$loop->iteration}}</td>
-                                    <td>
-                                        {!!$key2!!}
-                                        <br>
-                                        <p style="font-weight: 300; margin-top: 3px; margin-bottom: 3px;">Dokumen</p>
-                                        @foreach ($value->groupBy('simulationIndicatorsDocument.id') as $document)
-                                        <div style="border-bottom: 3px;">
-                                            <p>{{$document[0]->simulationIndicatorsDocument->name}}</p>
-                                        </div>
-                                        @endforeach
-                                    </td>
-                                    @foreach ($value->sortByDesc('created_on')->groupBy('created_on') as $isCheckeds)
-                                    <td style="vertical-align:bottom;">
-                                        @foreach ($isCheckeds as $isChecked)
-                                            @if ($isChecked->is_checked == 1)
-                                            <div style="bottom:0; border-bottom: 3px;">
-                                                <p><i class="fas fa-check"></i></p>
-                                            </div>
-                                            @else
-                                            <div style="bottom:0; border-bottom: 3px;">
-                                            <p><i class="fas fa-times"></i></p>
-                                            </div>
-                                            @endif
-                                        @endforeach
-                                    </td>
+                                    <th>No</th>
+                                    <th>Indikator dan Dokumen</th>
+                                    @foreach ($simulationDocDetail->sortByDesc('created_on')->groupBy('created_on') as $date => $value)
+                                    <th>{{Carbon\Carbon::parse($date)->format('d M Y H:i')}}</th>
                                     @endforeach
                                 </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Jumlah Skor Dokumen</th>
+                                    @foreach ($simulationsResults as $simulationsResultDoc)
+                                        @foreach ($simulationsResultDoc->scores as $scores)
+                                            @if ($scores->scoretype_component->name == $key)
+                                            <th>{{$scores->score_doc}} / {{$scores->score_doc_max}}</th>
+                                            @endif
+                                        @endforeach
+                                    @endforeach
+                                </tr>
+                                @foreach ($simulationDocDetail->sortBy('simulationIndicatorsDocument.id')->groupBy('simulationIndicatorsDocument.indicatorsQuestions.name') as $key2 => $value)
+                                    <tr>
+                                        <td>{{$loop->iteration}}</td>
+                                        <td>
+                                            <p style="font-weight: bold; margin-top: 0px; margin-bottom: 1px;">Indikator</p>
+                                            {!!wordwrap($key2, 70, '<br>')!!}
+                                            <br>
+                                            <p style="font-weight: bold; margin-top: 7px; margin-bottom: 1px;">Dokumen yang diperlukan</p>
+                                        </td>
+                                        @foreach ($value->sortByDesc('created_on')->groupBy('created_on') as $isCheckeds)
+                                        <td> </td>
+                                        @endforeach
+                                    </tr>
+                                    @foreach ($value->groupBy('simulationIndicatorsDocument.id') as $document)
+                                        <tr>
+                                            <td> </td>
+                                            <td>{!!wordwrap($document[0]->simulationIndicatorsDocument->name, 70, '<br>')!!}</td>
+                                            @foreach ($document->sortByDesc('created_on')->groupBy('created_on') as $isCheckeds)
+                                                @foreach ($isCheckeds as $isChecked)
+                                                <td>
+                                                    @if ($isChecked->is_checked == 1)
+                                                        <i class="fas fa-check"></i>
+                                                    @else
+                                                        <i class="fas fa-times"></i>
+                                                    @endif
+                                                </td>
+                                                @endforeach
+                                            @endforeach
+                                        </tr>
+                                    @endforeach
                                 @endforeach
                             </tbody>
-                        </tbody>
-                    </table>
+                        </table>
+                    </div>
                 </div>
                 @endforeach
             </div>
         </div>
         <div id="simulation-recap" class="ui-body-d ui-content">
-            <table data-role="table" id="table-simulation-recap" data-mode="reflow" class="ui-responsive table-stroke">
-                <thead>
-                    <tr>
-                        <th>No</th>
-                        <th>Tanggal</th>
-                        @foreach ($simulationScores as $key => $simulation)
-                        <th>{{$key}}</th>
+            <div class="overflow-auto">
+                <table data-role="table" id="table-simulation-recap" class="ui-responsive table-stroke">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Tanggal</th>
+                            @foreach ($simulationScores as $key => $simulation)
+                            <th>{{$key}}</th>
+                            @endforeach
+                            <th>NA</th>
+                            <th>Peringkat</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($simulationsResults as $simulationResult)
+                        <tr>
+                            <td>{{$loop->iteration}}</td>
+                            <td>{{Carbon\Carbon::parse($simulationResult->created_on)->format('d M Y H:i')}}</td>
+                            @foreach ($simulationResult->scores as $key => $scores)
+                            <td>
+                                <p class="font-weight-bold">Nilai : </p>
+                                {{$scores->score}} / {{$scores->score_max}}
+                                <br>
+                                <p class="font-weight-bold">Skor Dok : </p>
+                                {{$scores->score_doc}} / {{$scores->score_doc_max}}
+                            </td>
+                            @endforeach
+                            <td>{{$simulationResult->na}}</td>
+                            <td>{{$simulationResult->rating}}</td>
+                            <td>
+                                @if ($simulationResult->total_score < 44)
+                                <a href="{{ route('simulation.edit', ['id' => $simulationResult->id]) }}" target="_blank" class="ui-btn"><i class="fas fa-exclamation-triangle" style="color: #ffc107"></i> Lanjutkan Pengisian</a>
+                                @else
+                                <a href="{{ route('simulation.result', ['id' => $simulationResult->id]) }}" target="_blank" class="ui-btn">Lihat Hasil</a>
+                                @endif
+                                <button type="button" class="ui-btn" id="btn-del-{{$loop->iteration}}">Hapus</button>
+                            </td>
+                        </tr>
                         @endforeach
-                        <th>NA</th>
-                        <th>Peringkat</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($simulationsResults as $simulationResult)
-                    <tr>
-                        <td>{{$loop->iteration}}</td>
-                        <td>{{Carbon\Carbon::parse($simulationResult->created_on)->format('d M Y H:i')}}</td>
-                        @foreach ($simulationResult->scores as $key => $scores)
-                        <td>
-                            <p class="font-weight-bold">Nilai : </p>
-                            {{$scores->score}} / {{$scores->score_max}}
-                            <br>
-                            <p class="font-weight-bold">Skor Dok : </p>
-                            {{$scores->score_doc}} / {{$scores->score_doc_max}}
-                        </td>
-                        @endforeach
-                        <td>{{$simulationResult->na}}</td>
-                        <td>{{$simulationResult->rating}}</td>
-                        <td>
-                            @if ($simulationResult->total_score < 44)
-                            <a href="{{ route('simulation.edit', ['id' => $simulationResult->id]) }}" target="_blank" class="ui-btn"><i class="fas fa-exclamation-triangle" style="color: #ffc107"></i> Lanjutkan Pengisian</a>
-                            @else
-                            <a href="{{ route('simulation.result', ['id' => $simulationResult->id]) }}" target="_blank" class="ui-btn">Lihat Hasil</a>
-                            @endif
-                            <button type="button" class="ui-btn" id="btn-del-{{$loop->iteration}}">Hapus</button>
-                        </td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
-
+@endif
 @endsection
 
 @section('sim-js')
 <script>
     $(document).ready(function(){
+        $('table.display').DataTable( {
+            // scrollX: true,
+            // scrollCollapse: true,
+            paging: false,
+            ordering: false,
+            searching: false,
+            fixedColumns:   {
+                left: 2,
+            },
+        });
+
         $('#btn-kembali').show();
             $('#btn-kembali').click(function(){
                 window.location.href = "{{route('simulation.index')}}";
@@ -294,17 +324,21 @@
 
         @foreach ($simulationsResults as $simulationResult)
         $('#btn-del-{{$loop->iteration}}').click(function(){
-            $.ajax({
-                url: "{{route('simulation.delete', $simulationResult->id)}}",
-                type: 'DELETE',
-                data: {
-                    "_token": "{{ csrf_token() }}",
-                    "_method": "DELETE"
-                },
-                success: function(data) {
-                    window.location.href = "{{route('simulation.index')}}";
-                }
-            });
+            let confirmation = confirm('Hapus data ini?');
+
+            if (confirmation) {
+                $.ajax({
+                    url: "{{route('simulation.delete', $simulationResult->id)}}",
+                    type: 'DELETE',
+                    data: {
+                        "_token": "{{ csrf_token() }}",
+                        "_method": "DELETE"
+                    },
+                    success: function(data) {
+                        window.location.href = "{{route('simulation.index')}}";
+                    }
+                });
+            }
         });
         @endforeach
     })

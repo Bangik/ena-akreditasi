@@ -42,12 +42,12 @@
 @endsection
 @section('sim-main')
 
-    <center>
+    <div style="text-align: center;">
         <h1>Simulasi Akreditasi</h1>
         <button id="btn-riwayat" style="display: none"><span>Riwayat Simulasi</span></button>
         <button id="btn-mulai" style="display: none"><span>Mulai Simulasi</span></button>
         <button id="btn-selesai" style="display: none"><span>Akhiri Simulasi</span></button>
-    </center>
+    </div>
    
     <div data-role="tabs" id="tabs-simulation" style="display: none">
         <div data-role="navbar" class="menu">
@@ -137,7 +137,10 @@
                             <h1>Ambil data dokumen</h1>
                         </div>
                         <div role="main" class="ui-content">
-                            <form id="form-doc-sim">
+                            @if ($dataDocumentSims->count() <= 0)
+                            <p>Tidak ada data simulasi</p>
+                            <a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline" data-rel="back" id="batal-ambil">Batal</a>
+                            @else
                             @foreach ($dataDocumentSims as $dataDocumentSim)
                                 <label data-role="collapsible" data-collapsed-icon="carat-d" data-expanded-icon="carat-u">
                                     <h4> Tanggal : {{Carbon\Carbon::parse($dataDocumentSim->created_on)->format('d M Y H:i')}}</h4>
@@ -156,9 +159,9 @@
                                     <input type="checkbox" value="{{$dataDocumentSim->id}}" name="dataDocSim[]" class="dataDocSim">
                                 </label>
                             @endforeach
-                            </form>
                             <a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline" data-rel="back" id="batal-ambil">Batal</a>
                             <a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline" data-rel="back" id="ambil-data">Submit</a>
+                            @endif
                         </div>
                     </div>
                     <br>
