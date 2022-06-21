@@ -38,6 +38,78 @@
     color: black !important;
     text-shadow: none !important;
     }
+
+    .ui-popup-container{
+        position: fixed;
+    }
+
+    /* The Modal (background) */
+    .modal {
+        display: none; /* Hidden by default */
+        position: fixed; /* Stay in place */
+        z-index: 1100; /* Sit on top */
+        left: 0;
+        top: 0;
+        width: 100%; /* Full width */
+        height: 100%; /* Full height */
+        overflow: auto; /* Enable scroll if needed */
+        background-color: rgb(0,0,0); /* Fallback color */
+        background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    }
+
+    /* Modal Content */
+    .modal-content {
+        position: relative;
+        background-color: #fefefe;
+        margin: auto;
+        padding: 0;
+        border: 1px solid #ddd;
+        width: 80%;
+        box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+        -webkit-animation-name: animatetop;
+        -webkit-animation-duration: 0.4s;
+        animation-name: animatetop;
+        animation-duration: 0.4s
+    }
+
+    /* Add Animation */
+    @-webkit-keyframes animatetop {
+        from {top:-300px; opacity:0} 
+        to {top:0; opacity:1}
+    }
+
+    @keyframes animatetop {
+        from {top:-300px; opacity:0}
+        to {top:0; opacity:1}
+    }
+
+    /* The Close Button */
+    .close {
+        color: #000;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+    }
+
+    .close:hover,
+    .close:focus {
+        color: rgb(31, 31, 31);
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    .modal-header {
+        padding: 2px 16px;
+        background-color: #e9e9e9;
+        color: #333;
+    }
+
+    .modal-body {padding: 2px 16px;}
+
+    .modal-footer {
+        padding: 2px 16px;
+        color: #333;
+    }
 </style>
 @endsection
 @section('sim-main')
@@ -131,37 +203,47 @@
                     </div>
                     <br>
                     Ambil data Dokumen dari Simulasi Lain
-                    <a href="#popupDialog" data-rel="popup" data-position-to="window" data-transition="pop" class="ui-btn ui-corner-all ui-shadow ui-btn-inline">Disini</a>
-                    <div data-role="popup" id="popupDialog" data-overlay-theme="b" data-dismissible="false" style="width: 800px;">
-                        <div data-role="header" data-theme="a">
-                            <h1>Ambil data dokumen</h1>
-                        </div>
-                        <div role="main" class="ui-content">
-                            @if ($dataDocumentSims->count() <= 0)
-                            <p>Tidak ada data simulasi</p>
-                            <a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline" data-rel="back" id="batal-ambil">Batal</a>
-                            @else
-                            @foreach ($dataDocumentSims as $dataDocumentSim)
-                                <label data-role="collapsible" data-collapsed-icon="carat-d" data-expanded-icon="carat-u">
-                                    <h4> Tanggal : {{Carbon\Carbon::parse($dataDocumentSim->created_on)->format('d M Y H:i')}}</h4>
-                                    @foreach ($dataDocumentSim->scores as $scoreDoc)
-                                        @if($loop->iteration != 5)
-                                        <h5 style="font-weight: bold;font-size: larger;margin: 0px;">{{$scoreDoc->scoretype_component->name}} ({{$scoreDoc->score_doc}} / {{$scoreDoc->score_doc_max}}) </h5>
-                                            @foreach ($scoreDoc->simulationDocIndic as $simulationDocIndic)
-                                                @foreach ($simulationDocIndic->simulationDocDetail as $indicatorsDocuments)
-                                                    @if ($indicatorsDocuments->is_checked == 1)
-                                                        <p style="font-weight: normal;">{{$indicatorsDocuments->simulationIndicatorsDocument->name}}</p>
-                                                    @endif
-                                                @endforeach
+                    <button id="myBtn" type="button" class="ui-btn ui-corner-all ui-shadow ui-btn-inline">Disini</button>
+                    <div id="myModal" class="modal">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <span class="close">&times;</span>
+                                <h2>Ambil data dokumen</h2>
+                            </div>
+                            <div class="modal-body">
+                                @if ($dataDocumentSims->count() <= 0)
+                                <p>Tidak ada data simulasi</p>
+                                @else
+                                @foreach ($dataDocumentSims as $dataDocumentSim)
+                                    <label for="radio-doc-{{$loop->iteration}}">
+                                        <div data-role="collapsible" data-collapsed-icon="carat-d" data-expanded-icon="carat-u">
+                                            <h4> Tanggal : {{Carbon\Carbon::parse($dataDocumentSim->created_on)->format('d M Y H:i')}}</h4>
+                                            @foreach ($dataDocumentSim->scores as $scoreDoc)
+                                                @if($loop->iteration != 5)
+                                                <h5 style="font-weight: bold;font-size: larger;margin: 0px;">{{$scoreDoc->scoretype_component->name}} ({{$scoreDoc->score_doc}} / {{$scoreDoc->score_doc_max}}) </h5>
+                                                    @foreach ($scoreDoc->simulationDocIndic as $simulationDocIndic)
+                                                        @foreach ($simulationDocIndic->simulationDocDetail as $indicatorsDocuments)
+                                                            @if ($indicatorsDocuments->is_checked == 1)
+                                                                <p style="font-weight: normal;">{{$indicatorsDocuments->simulationIndicatorsDocument->name}}</p>
+                                                            @endif
+                                                        @endforeach
+                                                    @endforeach
+                                                @endif
                                             @endforeach
-                                        @endif
-                                    @endforeach
-                                    <input type="checkbox" value="{{$dataDocumentSim->id}}" name="dataDocSim[]" class="dataDocSim">
-                                </label>
-                            @endforeach
-                            <a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline" data-rel="back" id="batal-ambil">Batal</a>
-                            <a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline" data-rel="back" id="ambil-data">Submit</a>
-                            @endif
+                                        </div>
+                                    </label>
+                                    <input type="radio" id="radio-doc-{{$loop->iteration}}" value="{{$dataDocumentSim->id}}" name="dataDocSim" class="dataDocSim">
+                                @endforeach
+                                @endif
+                            </div>
+                            <div class="modal-footer">
+                                @if ($dataDocumentSims->count() <= 0)
+                                <a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline" id="batal-ambil">Batal</a>
+                                @else
+                                <a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline" id="batal-ambil">Batal</a>
+                                <a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline" id="ambil-data">Submit</a>
+                                @endif
+                            </div>
                         </div>
                     </div>
                     <br>
@@ -225,6 +307,27 @@
         let MyString = MyDate.toTimeString();
         let MyOffset = MyString.slice(12,17);
         $('#timezone').val(MyOffset);
+
+        // Get the modal
+        var modal = document.getElementById("myModal");
+        // Get the button that opens the modal
+        var btn = document.getElementById("myBtn");
+        // Get the <span> element that closes the modal
+        var span = document.getElementsByClassName("close")[0];
+        // When the user clicks the button, open the modal 
+        btn.onclick = function() {
+            modal.style.display = "block";
+        }
+        // When the user clicks on <span> (x), close the modal
+        span.onclick = function() {
+            modal.style.display = "none";
+        }
+        // When the user clicks anywhere outside of the modal, close it
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
 
         // $('#btn-siji-5').remove();
         
@@ -324,6 +427,10 @@
             }
         });
 
+        $('#batal-ambil').click(function(){
+            modal.style.display = "none";
+        });
+
         $('#ambil-data').click(function(){
             $.ajax({
                 url: "{{route('simulation.getDataDoc')}}",
@@ -336,16 +443,20 @@
                 },
                 success: function(data) {
                     if (data.status == 'success') {
+                        $('[data-from-old]').prop('checked', false).checkboxradio('refresh');
                         data.data.map(function(item){
                             $("[data-checkbox-id='"+ item + "']").prop('checked', true).checkboxradio('refresh');
                             $("[data-checkbox-id='"+ item + "']").attr('data-from-old', item);
                         });
+                        modal.style.display = "none";
                     } else {
                         $('[data-from-old]').prop('checked', false).checkboxradio('refresh');
+                        modal.style.display = "none";
                     }
                 },
                 error: function(data) {
                     alert('Terjadi kesalahan');
+                    modal.style.display = "none";
                 }
             });
         });
