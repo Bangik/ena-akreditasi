@@ -4,12 +4,11 @@ namespace App\Http\Controllers\Simulation;
 
 use App\Http\Controllers\Controller;
 use App\Models\ComponentsQuestions;
+use App\Models\IndicatorsDocuments;
 use App\Models\Scoretype;
 use App\Models\ScoretypeComponents;
 use App\Models\Simulation;
-use App\Models\SimulationDocDetail;
 use App\Models\SimulationDocIndic;
-use App\Models\SimulationDocument;
 use App\Models\SimulationScore;
 use App\Models\SimulationScoreDetail;
 use Carbon\Carbon;
@@ -27,16 +26,16 @@ class SimulationController extends Controller
             'componentQuestions.questionsIndicators.indicatorsDocuments',
             )->get();
         $dataComponentQuestions = ComponentsQuestions::with('questionsIndicators.indicatorsDocuments')->get();
-        // dd($scoretypeComponents[1]->toArray());
         $dataDocumentSims = Simulation::with(
-            'scores.simulationDocIndic.simulationDocDetail.simulationIndicatorsDocument',
             'scores.simulationDocIndic.questionIndicator.indicatorsDocuments',
         )->get()->sortByDesc('created_on');
-        // dd($dataDocumentSims->toArray());
+
+        $dataDoc = IndicatorsDocuments::with('indicatorsQuestions')->get();
+
         return view('simulation.index', compact(
             'scoretypeComponents',
             'dataComponentQuestions',
-            'dataDocumentSims'
+            'dataDoc'
         ));
     }
 
@@ -139,12 +138,8 @@ class SimulationController extends Controller
     
                     if(isset($request->indicatorDocuments[$value2])){
                         foreach($request->indicatorDocuments[$value2] as $key3 => $value3){
-                            SimulationDocDetail::create([
-                                'id' => 'sim.2.'.$key.'.'.$key3 . Str::random(10),
-                                'parent_id' => $simDocIndic->id,
-                                'indicators_documents_id' => $request->indicatorDocuments[$value2][$key3],
+                            IndicatorsDocuments::where('id', $request->indicatorDocuments[$value2][$key3])->update([
                                 'is_checked' => $request->isChecked[$value2][$key3],
-                                'created_on' => $timeNow,
                                 'modified_on' => $timeNow,
                             ]);
                             $score_sim_doc_indic += $request->isChecked[$value2][$key3];
@@ -248,22 +243,23 @@ class SimulationController extends Controller
             'scores.scoretype_component',
             'scores.simulationDetails.component_questions.questionsAnswers',
             'scores.simulationDetails.component_questions.questionsIndicators',
-            'scores.simulationDocIndic.simulationDocDetail',
         )
         ->get()
         ->sortByDesc('created_on');
 
-        $simulationDocDetails = SimulationDocDetail::with(
-            'simulationIndicatorsDocument.indicatorsQuestions.componentQuestions.scoretypeComponents',
-        )
-        ->get()
-        ->sortBy('simulationIndicatorsDocument.indicatorsQuestions.componentQuestions.scoretypeComponents.id')
-        ->groupBy('simulationIndicatorsDocument.indicatorsQuestions.componentQuestions.scoretypeComponents.name');
+        
 
+        // $simulationDocDetails = IndicatorsDocuments::with(
+        //     'simulationIndicatorsDocument.indicatorsQuestions.componentQuestions.scoretypeComponents',
+        // )
+        // ->get()
+        // ->sortBy('simulationIndicatorsDocument.indicatorsQuestions.componentQuestions.scoretypeComponents.id')
+        // ->groupBy('simulationIndicatorsDocument.indicatorsQuestions.componentQuestions.scoretypeComponents.name');
+        //     dd($simulationDocDetails);
         return view('simulation.resultBasedQuest', compact(
             'simulationScores',
             'simulationsResults',
-            'simulationDocDetails'
+            // 'simulationDocDetails'
         ));
     }
 

@@ -130,7 +130,7 @@
                 @endforeach
             </div>
         </div>
-        <div id="simulation-doc-result" class="ui-body-d ui-content">
+        {{-- <div id="simulation-doc-result" class="ui-body-d ui-content">
             <div data-role="tabs" id="tabs-simulation-doc-result">
                 <div data-role="navbar">
                     <ul>
@@ -201,7 +201,7 @@
                 </div>
                 @endforeach
             </div>
-        </div>
+        </div> --}}
         <div id="simulation-recap" class="ui-body-d ui-content">
             <div class="overflow-auto">
                 <table data-role="table" id="table-simulation-recap" class="ui-responsive table-stroke">
@@ -307,16 +307,6 @@
             @foreach ($simulationScores as $key => $simulationScore)
             $('#btn-simulation-score-result-{{ $loop->iteration }}').removeClass('clicked-up');
             $('btn-simulation-score-result-{{ $loop->iteration }}').removeClass('clicked-left');
-            @endforeach
-            $(this).addClass('clicked-up');
-        });
-        @endforeach
-
-        @foreach ($simulationDocDetails as $key => $simulationDocDetail)
-        $('#btn-simulation-doc-result-{{$loop->iteration}}').click(function(){
-            @foreach ($simulationDocDetails as $key => $simulationDocDetail)
-            $('#btn-simulation-doc-result-{{$loop->iteration}}').removeClass('clicked-up');
-            $('#btn-simulation-doc-result-{{$loop->iteration}}').removeClass('clicked-left');
             @endforeach
             $(this).addClass('clicked-up');
         });

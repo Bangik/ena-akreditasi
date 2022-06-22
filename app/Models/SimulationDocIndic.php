@@ -31,9 +31,4 @@ class SimulationDocIndic extends Model
     {
         return $this->belongsTo(QuestionsIndicators::class, 'questions_indicator_id', 'id');
     }
-
-    public function simulationDocDetail()
-    {
-        return $this->hasMany(SimulationDocDetail::class, 'parent_id', 'id');
-    }
 }
