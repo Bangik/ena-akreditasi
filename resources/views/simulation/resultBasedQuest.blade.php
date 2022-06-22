@@ -152,7 +152,7 @@
                                     <th>Indikator dan Dokumen</th>
                                     @foreach ($simulationsResults as $simulationsResult)
                                     @if($loop->iteration == 1)
-                                    <th>{{Carbon\Carbon::parse($simulationsResult->created_on)->format('d M Y H:i')}}</th>
+                                    <th>Terakhir diubah : {{Carbon\Carbon::parse($simulationsResult->created_on)->format('d M Y H:i')}}</th>
                                     @endif
                                     @endforeach
                                 </tr>
@@ -198,37 +198,6 @@
                                     @endforeach
                                 @endforeach
                                 @endforeach
-                                {{-- @foreach ($simulationDocDetail->sortBy('simulationIndicatorsDocument.id')->groupBy('simulationIndicatorsDocument.indicatorsQuestions.name') as $key2 => $value)
-                                    <tr>
-                                        <td>{{$loop->iteration}}</td>
-                                        <td>
-                                            <p style="font-weight: bold; margin-top: 0px; margin-bottom: 1px;">Indikator</p>
-                                            {!!wordwrap($key2, 70, '<br>')!!}
-                                            <br>
-                                            <p style="font-weight: bold; margin-top: 7px; margin-bottom: 1px;">Dokumen yang diperlukan</p>
-                                        </td>
-                                        @foreach ($value->sortByDesc('created_on')->groupBy('created_on') as $isCheckeds)
-                                        <td> </td>
-                                        @endforeach
-                                    </tr>
-                                    @foreach ($value->groupBy('simulationIndicatorsDocument.id') as $document)
-                                        <tr>
-                                            <td> </td>
-                                            <td>{!!wordwrap($document[0]->simulationIndicatorsDocument->name, 70, '<br>')!!}</td>
-                                            @foreach ($document->sortByDesc('created_on')->groupBy('created_on') as $isCheckeds)
-                                                @foreach ($isCheckeds as $isChecked)
-                                                <td>
-                                                    @if ($isChecked->is_checked == 1)
-                                                        <i class="fas fa-check"></i>
-                                                    @else
-                                                        <i class="fas fa-times"></i>
-                                                    @endif
-                                                </td>
-                                                @endforeach
-                                            @endforeach
-                                        </tr>
-                                    @endforeach
-                                @endforeach --}}
                             </tbody>
                         </table>
                     </div>
@@ -342,6 +311,16 @@
             @foreach ($simulationScores as $key => $simulationScore)
             $('#btn-simulation-score-result-{{ $loop->iteration }}').removeClass('clicked-up');
             $('btn-simulation-score-result-{{ $loop->iteration }}').removeClass('clicked-left');
+            @endforeach
+            $(this).addClass('clicked-up');
+        });
+        @endforeach
+
+        @foreach ($scoretypeComponents as $scoretypeComponent)
+        $('#btn-simulation-doc-result-{{$loop->iteration}}').click(function(){
+            @foreach ($scoretypeComponents as $scoretypeComponent)
+            $('#btn-simulation-doc-result-{{$loop->iteration}}').removeClass('clicked-up');
+            $('#btn-simulation-doc-result-{{$loop->iteration}}').removeClass('clicked-left');
             @endforeach
             $(this).addClass('clicked-up');
         });

@@ -358,40 +358,6 @@
                 $(this).val('');
             }
         });
-
-        $('#batal-ambil').click(function(){
-            modal.style.display = "none";
-        });
-
-        $('#ambil-data').click(function(){
-            $.ajax({
-                url: "{{route('simulation.getDataDoc')}}",
-                type: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': "{{ csrf_token() }}"
-                },
-                data: {
-                    'dataDocSim': $('.dataDocSim:checked').serializeArray()
-                },
-                success: function(data) {
-                    if (data.status == 'success') {
-                        $('[data-from-old]').prop('checked', false).checkboxradio('refresh');
-                        data.data.map(function(item){
-                            $("[data-checkbox-id='"+ item + "']").prop('checked', true).checkboxradio('refresh');
-                            $("[data-checkbox-id='"+ item + "']").attr('data-from-old', item);
-                        });
-                        modal.style.display = "none";
-                    } else {
-                        $('[data-from-old]').prop('checked', false).checkboxradio('refresh');
-                        modal.style.display = "none";
-                    }
-                },
-                error: function(data) {
-                    alert('Terjadi kesalahan');
-                    modal.style.display = "none";
-                }
-            });
-        });
     });
 </script>
 @endsection

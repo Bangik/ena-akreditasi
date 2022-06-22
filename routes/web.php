@@ -27,4 +27,3 @@ Route::get('/edit/{id}', [SimulationController::class, 'edit'])->name('simulatio
 Route::get('/result-based-question', [SimulationController::class, 'resultBasedOnQuestion'])->name('simulation.resultBasedOnQuestion');
 Route::post('/store', [SimulationController::class, 'store'])->name('simulation.store');
 Route::delete('/delete/{id}', [SimulationController::class, 'destroy'])->name('simulation.delete');
-Route::post('/get-data-doc', [SimulationController::class, 'getDataDoc'])->name('simulation.getDataDoc');

@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Simulation;
 
 use App\Http\Controllers\Controller;
-use App\Models\ComponentsQuestions;
 use App\Models\IndicatorsDocuments;
 use App\Models\Scoretype;
 use App\Models\ScoretypeComponents;
@@ -14,28 +13,22 @@ use App\Models\SimulationScoreDetail;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\DB;
+// use Illuminate\Support\Facades\DB;
 
 class SimulationController extends Controller
 {
     public function index()
     {
         // DB::enableQueryLog();
+
+        // data scortype components
         $scoretypeComponents = ScoretypeComponents::with(
             'componentQuestions.questionsAnswers',
             'componentQuestions.questionsIndicators.indicatorsDocuments',
-            )->get();
-        $dataComponentQuestions = ComponentsQuestions::with('questionsIndicators.indicatorsDocuments')->get();
-        $dataDocumentSims = Simulation::with(
-            'scores.simulationDocIndic.questionIndicator.indicatorsDocuments',
-        )->get()->sortByDesc('created_on');
-
-        $dataDoc = IndicatorsDocuments::with('indicatorsQuestions')->get();
+        )->get();
 
         return view('simulation.index', compact(
             'scoretypeComponents',
-            'dataComponentQuestions',
-            'dataDoc'
         ));
     }
 
@@ -196,6 +189,7 @@ class SimulationController extends Controller
         // return $request->all();
     }
 
+    // fungsi view result simulasi
     public function result($id)
     {
         $simulations = Simulation::with(
@@ -207,7 +201,6 @@ class SimulationController extends Controller
             'scores.simulationDocIndic.questionIndicator.indicatorsDocuments',
         )
         ->find($id);
-        // dd($simulations->toArray());
         return view('simulation.result', compact('simulations'));
     }
 
@@ -227,10 +220,14 @@ class SimulationController extends Controller
             'scores.simulationDocIndic.questionIndicator.indicatorsDocuments',
         )
         ->find($id);
-        // dd($simulations->toArray());
-        return view('simulation.edit', compact('simulations', 'dataDocumentSims'));
+
+        return view('simulation.edit', compact(
+            'simulations',
+            'dataDocumentSims'
+    ));
     }
 
+    // fungsi tampilan view result based on question
     public function resultBasedOnQuestion(){
         $simulationScores = SimulationScoreDetail::with(
             'component_questions.questionsAnswers',
@@ -247,8 +244,6 @@ class SimulationController extends Controller
         ->get()
         ->sortByDesc('created_on');
 
-        
-
         $scoretypeComponents = ScoretypeComponents::with(
             'componentQuestions.questionsAnswers',
             'componentQuestions.questionsIndicators.indicatorsDocuments',
@@ -262,47 +257,13 @@ class SimulationController extends Controller
         ));
     }
 
-    public function getDataDoc(Request $request){
-        $dataDocSim = $request->dataDocSim;
-        try{
-            foreach($dataDocSim as $value){
-                $simulationDoc = Simulation::with(
-                    'scores.simulationDocIndic.simulationDocDetail.simulationIndicatorsDocument',
-                    'scores.simulationDocIndic.questionIndicator.indicatorsDocuments',
-                )
-                ->find($value)
-                ->first();
-    
-                foreach($simulationDoc->scores as $value2){
-                    foreach($value2->simulationDocIndic as $value3){
-                        foreach($value3->simulationDocDetail as $value4){
-                            if($value4->is_checked == 1){
-                                $simulationDocs[] = $value4->indicators_documents_id;
-                            }
-                        }
-                    }
-                }
-            }
-            return response()->json([
-                'status' => 'success',
-                'code' => '200',
-                'message' => 'Data berhasil diambil',
-                'data' => $simulationDocs,
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'status' => 'error',
-                'code' => '404',
-                'message' => 'Data tidak ditemukan',
-            ]);
-        }
-    }
-
+    // fungsi hapus simulation
     public function destroy($id)
     {
+        // cari id simulation
         $data = Simulation::find($id);
         $data->delete();
-        // return redirect()->route('simulation.index');
+
         return response()->json([
             'status' => 'success',
             'message' => 'Data berhasil dihapus'
