@@ -249,17 +249,16 @@ class SimulationController extends Controller
 
         
 
-        // $simulationDocDetails = IndicatorsDocuments::with(
-        //     'simulationIndicatorsDocument.indicatorsQuestions.componentQuestions.scoretypeComponents',
-        // )
-        // ->get()
-        // ->sortBy('simulationIndicatorsDocument.indicatorsQuestions.componentQuestions.scoretypeComponents.id')
-        // ->groupBy('simulationIndicatorsDocument.indicatorsQuestions.componentQuestions.scoretypeComponents.name');
-        //     dd($simulationDocDetails);
+        $scoretypeComponents = ScoretypeComponents::with(
+            'componentQuestions.questionsAnswers',
+            'componentQuestions.questionsIndicators.indicatorsDocuments',
+        )->get();
+
+
         return view('simulation.resultBasedQuest', compact(
             'simulationScores',
             'simulationsResults',
-            // 'simulationDocDetails'
+            'scoretypeComponents'
         ));
     }
 

@@ -201,10 +201,6 @@
                         @endforeach
                         </ul>
                     </div>
-                    <br>
-                    Ambil data Dokumen dari Simulasi Lain
-                    <br>
-                    <br>
                     @foreach ($scoretypeComponents as $scoretypeComponent)
                     @if($loop->iteration != 5)
                     <div id="siji-{{$loop->iteration}}">
@@ -224,7 +220,7 @@
                                         <div class="ui-corner-all custom-corners">
                                             <div class="ui-bar ui-bar-a">Dokumen</div>
                                                 <!-- INDIKATOR -->
-                                                @foreach($questionsIndicator->indicatorsDocuments as $indicatorDocument)
+                                                @foreach($questionsIndicator->indicatorsDocuments->sortBy('seq') as $indicatorDocument)
                                                     <label>
                                                         <!-- INDIKATOR DOKUMEN -->
                                                         <input type="checkbox" name="isChecked[{{$questionsIndicator->id}}][]" value="1" data-checkbox-id="{{$indicatorDocument->id}}" class="checkbox-doc" {{$indicatorDocument->is_checked == 1 ? 'checked' : ''}}>{{$indicatorDocument->name}}
