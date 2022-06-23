@@ -152,7 +152,7 @@
                                     <th>Indikator dan Dokumen</th>
                                     @foreach ($simulationsResults as $simulationsResult)
                                     @if($loop->iteration == 1)
-                                    <th>Terakhir diubah : {{Carbon\Carbon::parse($simulationsResult->created_on)->format('d M Y H:i')}}</th>
+                                    <th>Terakhir diubah : {{Carbon\Carbon::parse($simulationsResult->updated_on)->format('d M Y H:i')}}</th>
                                     @endif
                                     @endforeach
                                 </tr>

@@ -49,9 +49,14 @@
     <table data-role="table" class="ui-responsive" style="width: 30%">
         <thead>
             <tr>
-                <th>Tanggal</th>
+                <th>Tanggal Mulai Simulasi</th>
                 <td>:</td>
                 <td>{{Carbon\Carbon::parse($simulations->created_on)->format('d M Y H:i')}}</td>
+            </tr>
+            <tr>
+                <th>Terakhir Update</th>
+                <td>:</td>
+                <td>{{Carbon\Carbon::parse($simulations->updated_on)->format('d M Y H:i')}}</td>
             </tr>
             <tr>
                 <th>Total Nilai</th>
@@ -140,40 +145,36 @@
             <div data-role="tabs" id="tabs2">
                 <div data-role="navbar" class="menu2">
                     <ul>
-                    @foreach ($simulations->scores as $scoreDoc)
+                        @foreach ($scoretypeComponents as $scoretypeComponent)
                         <!-- TAB KOMPONEN -->
                         @if($loop->iteration != 5)
-                        <li>
-                            <a href="#siji-{{$loop->iteration}}" id="btn-siji-{{$loop->iteration}}" class="{{$loop->iteration == 1 ? 'ui-btn-active' : ''}}">{{$scoreDoc->scoretype_component->name}}</a>
-                        </li>
+                        <li><a href="#siji-{{$loop->iteration}}" id="btn-siji-{{$loop->iteration}}" class="{{$loop->iteration == 1 ? 'ui-btn-active' : ''}}">{{$scoretypeComponent->name}}</a></li>
                         @endif
-                    @endforeach
+                        @endforeach
                     </ul>
                 </div>
 
-                @foreach ($simulations->scores as $scoreDoc)
+                @foreach ($scoretypeComponents as $scoretypeComponent)
                 @if($loop->iteration != 5)
                 <div id="siji-{{$loop->iteration}}">
                     <div class="ui-corner-all custom-corners">
-                        @foreach ($scoreDoc->scoretype_component->componentQuestions as $componentQuestions)           
+                        @foreach ($scoretypeComponent->componentQuestions->sortBy('seq') as $componentQuestion)      
                         <div class="ui-bar ui-bar-a">
                         <!-- PERTANYAAN -->
-                            <p>{{$loop->iteration}}. {{$componentQuestions->name}}</p>
+                            <p>{{$loop->iteration}}. {{$componentQuestion->name}}</p>
                             <div class="ui-body ui-body-a">
                                 <div class="ui-bar ui-bar-a">Indikator</div>
-                                @foreach ($scoreDoc->simulationDocIndic as $simulationDocIndic)
-                                    @if($componentQuestions->id == $simulationDocIndic->questionIndicator->parent_id)
-                                        <p style="font-weight:normal!important;">{{$simulationDocIndic->questionIndicator->seq}}. {!!$simulationDocIndic->questionIndicator->name!!}</p>
-                                        <div class="ui-body ui-body-a">
-                                            <div class="ui-bar ui-bar-a">Dokumen</div>
-                                            @foreach ($simulationDocIndic->simulationDocDetail as $indicatorsDocuments)
-                                                <label>
-                                                {{$indicatorsDocuments->simulationIndicatorsDocument->name}}
-                                                <input type="checkbox" {{$indicatorsDocuments->is_checked == 1 ? 'checked disabled' : 'disabled'}}>
-                                                </label>
-                                            @endforeach
-                                        </div>
-                                    @endif
+                                @foreach ($componentQuestion->questionsIndicators as $questionsIndicator)
+                                <p style="font-weight:normal!important;">{{$loop->iteration}}. {!!$questionsIndicator->name!!}</p>
+                                    <div class="ui-body ui-body-a">
+                                        <div class="ui-bar ui-bar-a">Dokumen</div>
+                                        @foreach($questionsIndicator->indicatorsDocuments->sortBy('seq') as $indicatorDocument)
+                                            <label>
+                                            {{$indicatorDocument->name}}
+                                            <input type="checkbox" {{$indicatorDocument->is_checked == 1 ? 'checked disabled' : 'disabled'}}>
+                                            </label>
+                                        @endforeach
+                                    </div>
                                 @endforeach
                             </div>
                         </div>

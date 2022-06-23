@@ -7,7 +7,6 @@ use App\Models\IndicatorsDocuments;
 use App\Models\Scoretype;
 use App\Models\ScoretypeComponents;
 use App\Models\Simulation;
-use App\Models\SimulationDocIndic;
 use App\Models\SimulationScore;
 use App\Models\SimulationScoreDetail;
 use Carbon\Carbon;
@@ -37,6 +36,7 @@ class SimulationController extends Controller
         // tabel simulasi
         $weight = Scoretype::get('weight');
         $timeNow = Carbon::now($request->timezone)->format('Y-m-d H:i:s');
+        $timeUpdate = Carbon::now($request->timezone)->format('Y-m-d H:i:s');
 
         // jika edit
         if($request->idSimulation != null || isset($request->idSimulation)){
@@ -49,7 +49,7 @@ class SimulationController extends Controller
             'id' => 'sim.'. Str::random(10),
             'created_on' => $timeNow,
             'created_by' => 1,
-            'modified_on' => $timeNow,
+            'modified_on' => $timeUpdate,
             'modified_by' => 1,
         ]);
         
@@ -70,7 +70,7 @@ class SimulationController extends Controller
                 'scoretype_component_id' => $value,
                 'created_on' => $timeNow,
                 'created_by' => 1,
-                'modified_on' => $timeNow,
+                'modified_on' => $timeUpdate,
                 'modified_by' => 1,
             ]);
             
@@ -94,7 +94,7 @@ class SimulationController extends Controller
                     'score' => $value2,
                     'created_on' => $timeNow,
                     'created_by' => 1,
-                    'modified_on' => $timeNow,
+                    'modified_on' => $timeUpdate,
                     'modified_by' => 1,
                 ]);
                 $score += $value2;
@@ -109,23 +109,12 @@ class SimulationController extends Controller
             
             ////////////////////////////////////////////////////////////////
 
-            // insert ke tabel simulation_document
+            // update dokumen ke tabel simulation_document
             $score_sim_doc = 0;
             $score_sim_doc_max = 0;
 
             if(isset($request->questionIndicatorsId[$value])){
                 foreach($request->questionIndicatorsId[$value] as $key => $value2){
-
-                    $simDocIndic = SimulationDocIndic::create([
-                        'id' => 'sim.2.'.$key . Str::random(10),
-                        'parent_id' => $scores->id,
-                        'questions_indicator_id' => $value2,
-                        'created_on' => $timeNow,
-                        'created_by' => 1,
-                        'modified_on' => $timeNow,
-                        'modified_by' => 1,
-                    ]);
-
                     $score_sim_doc_indic = 0;
                     $score_sim_doc_indic_max = 0;
     
@@ -133,17 +122,12 @@ class SimulationController extends Controller
                         foreach($request->indicatorDocuments[$value2] as $key3 => $value3){
                             IndicatorsDocuments::where('id', $request->indicatorDocuments[$value2][$key3])->update([
                                 'is_checked' => $request->isChecked[$value2][$key3],
-                                'modified_on' => $timeNow,
+                                'modified_on' => $timeUpdate,
                             ]);
                             $score_sim_doc_indic += $request->isChecked[$value2][$key3];
                             $score_sim_doc_indic_max = count($request->indicatorDocuments[$value2]);
                         }
                     }
-
-                    SimulationDocIndic::where('id', $simDocIndic->id)->update([
-                        'score' => $score_sim_doc_indic,
-                        'score_max' => $score_sim_doc_indic_max,
-                    ]);
 
                     $score_sim_doc += $score_sim_doc_indic;
                     $score_sim_doc_max += $score_sim_doc_indic_max;
@@ -197,33 +181,38 @@ class SimulationController extends Controller
             'scores.simulationDetails.component_questions.questionsAnswers',
             'scores.simulationDetails.component_questions.questionsIndicators',
             'scores.scoretype_component.componentQuestions.questionsIndicators',
-            'scores.simulationDocIndic.simulationDocDetail.simulationIndicatorsDocument',
-            'scores.simulationDocIndic.questionIndicator.indicatorsDocuments',
         )
         ->find($id);
-        return view('simulation.result', compact('simulations'));
+
+        $scoretypeComponents = ScoretypeComponents::with(
+            'componentQuestions.questionsAnswers',
+            'componentQuestions.questionsIndicators.indicatorsDocuments',
+        )->get();
+
+        return view('simulation.result', compact(
+            'simulations',
+            'scoretypeComponents',
+        ));
     }
 
     public function edit($id)
     {
-        $dataDocumentSims = Simulation::with(
-            'scores.simulationDocIndic.simulationDocDetail.simulationIndicatorsDocument',
-            'scores.simulationDocIndic.questionIndicator.indicatorsDocuments',
-        )->get()->sortByDesc('created_on');
-
         $simulations = Simulation::with(
             'scores.scoretype_component',
             'scores.simulationDetails.component_questions.questionsAnswers',
             'scores.simulationDetails.component_questions.questionsIndicators',
             'scores.scoretype_component.componentQuestions.questionsIndicators',
-            'scores.simulationDocIndic.simulationDocDetail.simulationIndicatorsDocument',
-            'scores.simulationDocIndic.questionIndicator.indicatorsDocuments',
         )
         ->find($id);
 
+        $scoretypeComponents = ScoretypeComponents::with(
+            'componentQuestions.questionsAnswers',
+            'componentQuestions.questionsIndicators.indicatorsDocuments',
+        )->get();
+
         return view('simulation.edit', compact(
             'simulations',
-            'dataDocumentSims'
+            'scoretypeComponents',
     ));
     }
 
@@ -248,7 +237,6 @@ class SimulationController extends Controller
             'componentQuestions.questionsAnswers',
             'componentQuestions.questionsIndicators.indicatorsDocuments',
         )->get();
-
 
         return view('simulation.resultBasedQuest', compact(
             'simulationScores',
