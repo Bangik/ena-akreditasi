@@ -139,7 +139,7 @@
                                     </div>
                                     <div class="ui-block-b">
                                         <div class="ui-bar ui-bar-a" style="text-align: right">Nilai (1-4) &nbsp
-                                            <input type="number" data-clear-btn="false" data-role="none" name="nilai[{{$simulation_detail->component_questions->parent_id}}][]" value="{{$simulation_detail->score}}" min="1" max="4" style="height: 15px; width:50px; float:right">
+                                            <input type="number" class="nilais" data-clear-btn="false" data-role="none" name="nilai[{{$simulation_detail->component_questions->parent_id}}][]" value="{{$simulation_detail->score}}" min="1" max="4" style="height: 15px; width:50px; float:right">
                                         </div>
                                     </div>
                                 </div>
@@ -166,43 +166,41 @@
             <div data-role="tabs" id="tabs2">
                 <div data-role="navbar" class="menu2">
                     <ul>
-                    @foreach ($simulations->scores->sortBy('scoretype_component_id') as $scoreDoc)
-                        <!-- TAB KOMPONEN -->
-                        @if($loop->iteration != 5)
-                        <li>
-                            <a href="#siji-{{$loop->iteration}}" id="btn-siji-{{$loop->iteration}}" class="{{$loop->iteration == 1 ? 'ui-btn-active' : ''}}">{{$scoreDoc->scoretype_component->name}}</a>
-                        </li>
-                        @endif
+                    @foreach ($scoretypeComponents as $scoretypeComponent)
+                    <!-- TAB KOMPONEN -->
+                    @if($loop->iteration != 5)
+                    <li><a href="#siji-{{$loop->iteration}}" id="btn-siji-{{$loop->iteration}}" class="{{$loop->iteration == 1 ? 'ui-btn-active' : ''}}">{{$scoretypeComponent->name}}</a></li>
+                    @endif
                     @endforeach
                     </ul>
                 </div>
-
-                @foreach ($simulations->scores->sortBy('scoretype_component_id') as $scoreDoc)
+                @foreach ($scoretypeComponents as $scoretypeComponent)
                 @if($loop->iteration != 5)
                 <div id="siji-{{$loop->iteration}}">
                     <div class="ui-corner-all custom-corners">
-                        @foreach ($scoreDoc->scoretype_component->componentQuestions as $componentQuestions)           
+                        @foreach ($scoretypeComponent->componentQuestions->sortBy('seq') as $componentQuestion)
                         <div class="ui-bar ui-bar-a">
-                        <!-- PERTANYAAN -->
-                            <p>{{$loop->iteration}}. {{$componentQuestions->name}}</p>
+                            <!-- PERTANYAAN -->
+                            <p>{{$loop->iteration}}. {{$componentQuestion->name}}</p>
+
                             <div class="ui-body ui-body-a">
                                 <div class="ui-bar ui-bar-a">Indikator</div>
-                                @foreach ($scoreDoc->simulationDocIndic as $simulationDocIndic)
-                                {{-- @dd($componentQuestions->toArray()) --}}
-                                @if($componentQuestions->id == $simulationDocIndic->questionIndicator->parent_id)
-                                <input type="hidden" name="questionIndicatorsId[{{$componentQuestions->parent_id}}][]" value="{{$simulationDocIndic->questions_indicator_id}}">
-                                        <p style="font-weight:normal!important;">{{$simulationDocIndic->questionIndicator->seq}}. {!!$simulationDocIndic->questionIndicator->name!!}</p>
-                                        <div class="ui-body ui-body-a">
-                                            <div class="ui-bar ui-bar-a">Dokumen</div>
-                                            @foreach ($simulationDocIndic->simulationDocDetail as $indicatorsDocuments)
-                                            {{-- @dd($indicatorsDocuments->toArray()) --}}
+                                @foreach ($componentQuestion->questionsIndicators as $questionsIndicator)
+                                    <input type="hidden" name="questionIndicatorsId[{{$scoretypeComponent->id}}][]" value="{{$questionsIndicator->id}}">
+                                    <!-- INDIKATOR -->
+                                    <p style="font-weight:normal!important;">{{$loop->iteration}}. {!!$questionsIndicator->name!!}</p>
+                                    @if($questionsIndicator->indicatorsDocuments->count() != 0)
+                                    <div class="ui-corner-all custom-corners">
+                                        <div class="ui-bar ui-bar-a">Dokumen</div>
+                                            <!-- INDIKATOR -->
+                                            @foreach($questionsIndicator->indicatorsDocuments->sortBy('seq') as $indicatorDocument)
                                                 <label>
-                                                {{$indicatorsDocuments->simulationIndicatorsDocument->name}}
-                                                <input type="checkbox" name="isChecked[{{$indicatorsDocuments->simulationIndicatorsDocument->parent_id}}][]" {{$indicatorsDocuments->is_checked == 1 ? 'checked' : ''}} value="1">
-                                                <input type="hidden" name="indicatorDocuments[{{$indicatorsDocuments->simulationIndicatorsDocument->parent_id}}][]" value="{{$indicatorsDocuments->indicators_documents_id}}">
+                                                    <!-- INDIKATOR DOKUMEN -->
+                                                    <input type="checkbox" name="isChecked[{{$questionsIndicator->id}}][]" value="1" data-checkbox-id="{{$indicatorDocument->id}}" class="checkbox-doc" {{$indicatorDocument->is_checked == 1 ? 'checked' : ''}}>{{$indicatorDocument->name}}
+                                                    <input type="hidden" name="indicatorDocuments[{{$questionsIndicator->id}}][]" value="{{$indicatorDocument->id}}">
                                                 </label>
                                             @endforeach
-                                        </div>
+                                    </div>
                                     @endif
                                 @endforeach
                             </div>

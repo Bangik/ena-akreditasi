@@ -33,9 +33,4 @@ class QuestionsIndicators extends Model
     {
         return $this->hasMany(IndicatorsDocuments::class, 'parent_id', 'id');
     }
-
-    public function simulationDocIndic()
-    {
-        return $this->hasMany(SimulationDocIndic::class, 'parent_id', 'id');
-    }
 }

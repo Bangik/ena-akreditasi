@@ -18,9 +18,4 @@ class IndicatorsDocuments extends Model
     {
         return $this->belongsTo(QuestionsIndicators::class, 'parent_id', 'id');
     }
-
-    public function simulationDocDetail()
-    {
-        return $this->hasMany(SimulationDocDetail::class, 'indicators_documents_id', 'id');
-    }
 }

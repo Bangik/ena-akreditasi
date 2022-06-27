@@ -20,6 +20,7 @@ class IndicatorsDocuments extends Migration
             $table->tinyInteger('seq', false, false);
             $table->text('name');
             $table->string('isactive', 1)->default('1');
+            $table->string('is_checked', 1)->default('0');
             $table->datetime('created_on')->nullable();
             $table->string('created_by', 25)->nullable();
             $table->datetime('modified_on')->nullable();

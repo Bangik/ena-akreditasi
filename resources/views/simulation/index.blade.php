@@ -201,53 +201,6 @@
                         @endforeach
                         </ul>
                     </div>
-                    <br>
-                    Ambil data Dokumen dari Simulasi Lain
-                    <button id="myBtn" type="button" class="ui-btn ui-corner-all ui-shadow ui-btn-inline">Disini</button>
-                    <div id="myModal" class="modal">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <span class="close">&times;</span>
-                                <h2>Ambil data dokumen</h2>
-                            </div>
-                            <div class="modal-body">
-                                @if ($dataDocumentSims->count() <= 0)
-                                <p>Tidak ada data simulasi</p>
-                                @else
-                                @foreach ($dataDocumentSims as $dataDocumentSim)
-                                    <label for="radio-doc-{{$loop->iteration}}">
-                                        <div data-role="collapsible" data-collapsed-icon="carat-d" data-expanded-icon="carat-u">
-                                            <h4> Tanggal : {{Carbon\Carbon::parse($dataDocumentSim->created_on)->format('d M Y H:i')}}</h4>
-                                            @foreach ($dataDocumentSim->scores as $scoreDoc)
-                                                @if($loop->iteration != 5)
-                                                <h5 style="font-weight: bold;font-size: larger;margin: 0px;">{{$scoreDoc->scoretype_component->name}} ({{$scoreDoc->score_doc}} / {{$scoreDoc->score_doc_max}}) </h5>
-                                                    @foreach ($scoreDoc->simulationDocIndic as $simulationDocIndic)
-                                                        @foreach ($simulationDocIndic->simulationDocDetail as $indicatorsDocuments)
-                                                            @if ($indicatorsDocuments->is_checked == 1)
-                                                                <p style="font-weight: normal;">{{$indicatorsDocuments->simulationIndicatorsDocument->name}}</p>
-                                                            @endif
-                                                        @endforeach
-                                                    @endforeach
-                                                @endif
-                                            @endforeach
-                                        </div>
-                                    </label>
-                                    <input type="radio" id="radio-doc-{{$loop->iteration}}" value="{{$dataDocumentSim->id}}" name="dataDocSim" class="dataDocSim">
-                                @endforeach
-                                @endif
-                            </div>
-                            <div class="modal-footer">
-                                @if ($dataDocumentSims->count() <= 0)
-                                <a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline" id="batal-ambil">Batal</a>
-                                @else
-                                <a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline" id="batal-ambil">Batal</a>
-                                <a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline" id="ambil-data">Submit</a>
-                                @endif
-                            </div>
-                        </div>
-                    </div>
-                    <br>
-                    <br>
                     @foreach ($scoretypeComponents as $scoretypeComponent)
                     @if($loop->iteration != 5)
                     <div id="siji-{{$loop->iteration}}">
@@ -267,10 +220,10 @@
                                         <div class="ui-corner-all custom-corners">
                                             <div class="ui-bar ui-bar-a">Dokumen</div>
                                                 <!-- INDIKATOR -->
-                                                @foreach($questionsIndicator->indicatorsDocuments as $indicatorDocument)
+                                                @foreach($questionsIndicator->indicatorsDocuments->sortBy('seq') as $indicatorDocument)
                                                     <label>
                                                         <!-- INDIKATOR DOKUMEN -->
-                                                        <input type="checkbox" name="isChecked[{{$questionsIndicator->id}}][]" value="1" data-checkbox-id="{{$indicatorDocument->id}}" class="checkbox-doc">{{$indicatorDocument->name}}
+                                                        <input type="checkbox" name="isChecked[{{$questionsIndicator->id}}][]" value="1" data-checkbox-id="{{$indicatorDocument->id}}" class="checkbox-doc" {{$indicatorDocument->is_checked == 1 ? 'checked' : ''}}>{{$indicatorDocument->name}}
                                                         <input type="hidden" name="indicatorDocuments[{{$questionsIndicator->id}}][]" value="{{$indicatorDocument->id}}">
                                                     </label>
                                                 @endforeach
@@ -307,27 +260,6 @@
         let MyString = MyDate.toTimeString();
         let MyOffset = MyString.slice(12,17);
         $('#timezone').val(MyOffset);
-
-        // Get the modal
-        var modal = document.getElementById("myModal");
-        // Get the button that opens the modal
-        var btn = document.getElementById("myBtn");
-        // Get the <span> element that closes the modal
-        var span = document.getElementsByClassName("close")[0];
-        // When the user clicks the button, open the modal 
-        btn.onclick = function() {
-            modal.style.display = "block";
-        }
-        // When the user clicks on <span> (x), close the modal
-        span.onclick = function() {
-            modal.style.display = "none";
-        }
-        // When the user clicks anywhere outside of the modal, close it
-        window.onclick = function(event) {
-            if (event.target == modal) {
-                modal.style.display = "none";
-            }
-        }
 
         // $('#btn-siji-5').remove();
         
@@ -425,40 +357,6 @@
                 alert('Nilai tidak boleh lebih dari 4 atau lebih kecil dari 1');
                 $(this).val('');
             }
-        });
-
-        $('#batal-ambil').click(function(){
-            modal.style.display = "none";
-        });
-
-        $('#ambil-data').click(function(){
-            $.ajax({
-                url: "{{route('simulation.getDataDoc')}}",
-                type: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': "{{ csrf_token() }}"
-                },
-                data: {
-                    'dataDocSim': $('.dataDocSim:checked').serializeArray()
-                },
-                success: function(data) {
-                    if (data.status == 'success') {
-                        $('[data-from-old]').prop('checked', false).checkboxradio('refresh');
-                        data.data.map(function(item){
-                            $("[data-checkbox-id='"+ item + "']").prop('checked', true).checkboxradio('refresh');
-                            $("[data-checkbox-id='"+ item + "']").attr('data-from-old', item);
-                        });
-                        modal.style.display = "none";
-                    } else {
-                        $('[data-from-old]').prop('checked', false).checkboxradio('refresh');
-                        modal.style.display = "none";
-                    }
-                },
-                error: function(data) {
-                    alert('Terjadi kesalahan');
-                    modal.style.display = "none";
-                }
-            });
         });
     });
 </script>

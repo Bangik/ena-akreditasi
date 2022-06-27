@@ -134,12 +134,15 @@
             <div data-role="tabs" id="tabs-simulation-doc-result">
                 <div data-role="navbar">
                     <ul>
-                        @foreach ($simulationDocDetails as $key => $simulationDocDetail)
-                        <li><a href="#simulation-doc-result-{{$loop->iteration}}" id="btn-simulation-doc-result-{{$loop->iteration}}" data-ajax="false" class="{{$loop->iteration == 1 ? 'ui-btn-active' : ''}}">{{$key}}</a></li>
+                        @foreach ($scoretypeComponents as $scoretypeComponent)
+                        @if($loop->iteration != 5)
+                        <li><a href="#simulation-doc-result-{{$loop->iteration}}" id="btn-simulation-doc-result-{{$loop->iteration}}" data-ajax="false" class="{{$loop->iteration == 1 ? 'ui-btn-active' : ''}}">{{$scoretypeComponent->name}}</a></li>
+                        @endif
                         @endforeach
                     </ul>
                 </div>
-                @foreach ($simulationDocDetails as $key => $simulationDocDetail)
+                @foreach ($scoretypeComponents as $scoretypeComponent)
+                @if($loop->iteration != 5)
                 <div id="simulation-doc-result-{{$loop->iteration}}" class="ui-body-d ui-content">
                     <div class="overflow-auto">
                         <table data-role="table" id="table-doc-{{$loop->iteration}}" class="ui-responsive table-stroke display">
@@ -147,8 +150,10 @@
                                 <tr>
                                     <th>No</th>
                                     <th>Indikator dan Dokumen</th>
-                                    @foreach ($simulationDocDetail->sortByDesc('created_on')->groupBy('created_on') as $date => $value)
-                                    <th>{{Carbon\Carbon::parse($date)->format('d M Y H:i')}}</th>
+                                    @foreach ($simulationsResults as $simulationsResult)
+                                    @if($loop->iteration == 1)
+                                    <th>Terakhir diubah : {{Carbon\Carbon::parse($simulationsResult->updated_on)->format('d M Y H:i')}}</th>
+                                    @endif
                                     @endforeach
                                 </tr>
                             </thead>
@@ -156,49 +161,48 @@
                                 <tr>
                                     <th>#</th>
                                     <th>Jumlah Skor Dokumen</th>
-                                    @foreach ($simulationsResults as $simulationsResultDoc)
-                                        @foreach ($simulationsResultDoc->scores as $scores)
-                                            @if ($scores->scoretype_component->name == $key)
-                                            <th>{{$scores->score_doc}} / {{$scores->score_doc_max}}</th>
-                                            @endif
-                                        @endforeach
+                                    @foreach ($simulationsResults as $simulationsResult)
+                                        @if($loop->iteration == 1)
+                                            @foreach ($simulationsResult->scores as $scores)
+                                                @if ($scores->scoretype_component->id == $scoretypeComponent->id)
+                                                <th>{{$scores->score_doc}} / {{$scores->score_doc_max}}</th>
+                                                @endif
+                                            @endforeach
+                                        @endif
                                     @endforeach
                                 </tr>
-                                @foreach ($simulationDocDetail->sortBy('simulationIndicatorsDocument.id')->groupBy('simulationIndicatorsDocument.indicatorsQuestions.name') as $key2 => $value)
+                                @foreach ($scoretypeComponent->componentQuestions->sortBy('seq') as $componentQuestion)
+                                @foreach ($componentQuestion->questionsIndicators as $questionsIndicator)
                                     <tr>
                                         <td>{{$loop->iteration}}</td>
                                         <td>
                                             <p style="font-weight: bold; margin-top: 0px; margin-bottom: 1px;">Indikator</p>
-                                            {!!wordwrap($key2, 70, '<br>')!!}
+                                            {!!wordwrap($questionsIndicator->name, 70, '<br>')!!}
                                             <br>
                                             <p style="font-weight: bold; margin-top: 7px; margin-bottom: 1px;">Dokumen yang diperlukan</p>
                                         </td>
-                                        @foreach ($value->sortByDesc('created_on')->groupBy('created_on') as $isCheckeds)
                                         <td> </td>
-                                        @endforeach
                                     </tr>
-                                    @foreach ($value->groupBy('simulationIndicatorsDocument.id') as $document)
+                                    @foreach ($questionsIndicator->indicatorsDocuments->sortBy('seq') as $indicatorsDocument)
                                         <tr>
                                             <td> </td>
-                                            <td>{!!wordwrap($document[0]->simulationIndicatorsDocument->name, 70, '<br>')!!}</td>
-                                            @foreach ($document->sortByDesc('created_on')->groupBy('created_on') as $isCheckeds)
-                                                @foreach ($isCheckeds as $isChecked)
-                                                <td>
-                                                    @if ($isChecked->is_checked == 1)
-                                                        <i class="fas fa-check"></i>
-                                                    @else
-                                                        <i class="fas fa-times"></i>
-                                                    @endif
-                                                </td>
-                                                @endforeach
-                                            @endforeach
+                                            <td>{!!wordwrap($indicatorsDocument->name, 70, '<br>')!!}</td>
+                                            <td>
+                                                @if ($indicatorsDocument->is_checked == 1)
+                                                    <i class="fas fa-check"></i>
+                                                @else
+                                                    <i class="fas fa-times"></i>
+                                                @endif
+                                            </td>
                                         </tr>
                                     @endforeach
+                                @endforeach
                                 @endforeach
                             </tbody>
                         </table>
                     </div>
                 </div>
+                @endif
                 @endforeach
             </div>
         </div>
@@ -312,9 +316,9 @@
         });
         @endforeach
 
-        @foreach ($simulationDocDetails as $key => $simulationDocDetail)
+        @foreach ($scoretypeComponents as $scoretypeComponent)
         $('#btn-simulation-doc-result-{{$loop->iteration}}').click(function(){
-            @foreach ($simulationDocDetails as $key => $simulationDocDetail)
+            @foreach ($scoretypeComponents as $scoretypeComponent)
             $('#btn-simulation-doc-result-{{$loop->iteration}}').removeClass('clicked-up');
             $('#btn-simulation-doc-result-{{$loop->iteration}}').removeClass('clicked-left');
             @endforeach
